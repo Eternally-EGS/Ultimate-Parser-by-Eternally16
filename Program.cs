@@ -1,5 +1,6 @@
 ﻿using AngleSharp;
 using AngleSharp.Dom;
+using System.IO;
 
 
 // Default config settings
@@ -14,17 +15,23 @@ try {
 var document = await context.OpenAsync("https://lenta.ru");
 
 // Parsing point
-var titles = document.QuerySelectorAll("h3");
+var titles = document.QuerySelectorAll("[class='card-mini__title']");
+
+// Create list
+var EndList = titles.Select(h => h.TextContent.Trim());
 
 try {
 
 // Output
-Console.WriteLine($"Я нихуя не понимаю количество заголовков: {titles.Length}");
-
+var text1 = $"Я нихуя не понимаю количество заголовков: {titles.Length}";
 
 foreach(var tit in titles){
     Console.WriteLine(tit.TextContent.Trim());
+
 }
+
+//File.WriteAllText("Out.txt",text1 + EndList);
+
 
 } catch(Exception ex) {
 Console.WriteLine($"Ошибка: {ex}");
