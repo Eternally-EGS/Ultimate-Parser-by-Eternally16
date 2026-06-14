@@ -18,19 +18,26 @@ var document = await context.OpenAsync("https://lenta.ru");
 var titles = document.QuerySelectorAll("[class='card-mini__title']");
 
 // Create list
-var EndList = titles.Select(h => h.TextContent.Trim());
+var EndList = titles
+.Select(el => el.TextContent.Trim())
+.ToList();
+
+// Output
+var text1 = $"количество заголовков: {titles.Length}";
+
+EndList.Insert(0,text1);
+
+File.WriteAllLines("Out.txt",EndList);
 
 try {
 
-// Output
-var text1 = $"Я нихуя не понимаю количество заголовков: {titles.Length}";
+
 
 foreach(var tit in titles){
     Console.WriteLine(tit.TextContent.Trim());
 
 }
 
-//File.WriteAllText("Out.txt",text1 + EndList);
 
 
 } catch(Exception ex) {
