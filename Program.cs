@@ -18,15 +18,24 @@ var time = document.QuerySelectorAll("[class='card-mini__info-item']");
 
 
 var str0 = titles.Select(el => el.TextContent.Trim()).ToList();
-var str1 = link.Select(el => el.GetAttribute("href")).ToList();
+var str1 = link.Select(el => el.GetAttribute("href") ?? "Нет ссылки").ToList();
 var str2 = time.Select(el => el.TextContent.Trim()).ToList();
 
 str0.AddRange(str1);
 str0.AddRange(str2);
 
 
-str0.ForEach(Console.WriteLine);
+//str0.ForEach(Console.WriteLine);
+
+//Console.WriteLine($"{"Titles",-40} | {"links",-60} | {"Time",-20}");
 File.WriteAllLines("Out.txt",str0);
+
+using(var writer = new StreamWriter("Out.csv")){
+    writer.WriteLine("Titles,Links,Times");
+    for(int i = 0;i< titles.Count;i++){
+        writer.WriteLine($"\"{str0[i]}\",\"{str1[i]}\",\"{str2[i]}\"");
+    }
+}
 
 
 
