@@ -1,6 +1,7 @@
 ﻿using AngleSharp;
 using AngleSharp.Dom;
 using System.IO;
+using System.Text;
 
 
 // Default config settings
@@ -9,8 +10,10 @@ var config = Configuration.Default.WithDefaultLoader();
 // Creating browser
 var context = BrowsingContext.New(config);
 
+string url = "https://lenta.ru";
+
 // Create base page
-var document = await context.OpenAsync("https://lenta.ru");
+var document = await context.OpenAsync(url);
 
 var titles = document.QuerySelectorAll("[class='card-mini__title']");
 var link = document.QuerySelectorAll("[class='card-mini _topnews']");
@@ -33,7 +36,7 @@ File.WriteAllLines("Out.txt",str0);
 using(var writer = new StreamWriter("Out.csv")){
     writer.WriteLine("Titles,Links,Times");
     for(int i = 0;i< titles.Count;i++){
-        writer.WriteLine($"\"{str0[i]}\",\"{str1[i]}\",\"{str2[i]}\"");
+        writer.WriteLine($"\"{str0[i]}\",\"{url + str1[i]}\",\"{str2[i]}\"");
     }
 }
 
