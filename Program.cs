@@ -33,7 +33,7 @@ str0.AddRange(str2);
 //Console.WriteLine($"{"Titles",-40} | {"links",-60} | {"Time",-20}");
 File.WriteAllLines("Out.txt",str0);
 
-using(var writer = new StreamWriter("Out.csv")){
+using(var writer = new StreamWriter("Out.csv",false,Encoding.UTF8)){
     writer.WriteLine("Titles,Links,Times");
     for(int i = 0;i< titles.Count;i++){
         writer.WriteLine($"\"{str0[i]}\",\"{url + str1[i]}\",\"{str2[i]}\"");
