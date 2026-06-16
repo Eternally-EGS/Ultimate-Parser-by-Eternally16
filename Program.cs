@@ -35,11 +35,10 @@ foreach(var item in items) {
         string localName = field0.Name;
         string localSelector = field0.Selector;
         string localAttribute = field0?.Attribute ?? "";
-//Console.WriteLine($"ДО Атребут : {localAttribute ?? "NULL"} ");
-        var element = item.QuerySelector(localSelector);
-//Console.WriteLine($"ПОЧЬТИ  Атребут : {localAttribute ?? "NULL"} ");
+        
+        var element = string.IsNullOrEmpty(localSelector) ? item : item.QuerySelector(localSelector);
         if (element == null) { continue; }
-//Console.WriteLine($"ПОСЛЕ Атребут : {localAttribute ?? "NULL"} ");
+
         string value;
         if(!string.IsNullOrEmpty(localAttribute)) {
             value = element?.GetAttribute(localAttribute) ?? "";
@@ -63,7 +62,26 @@ foreach (var row in results) {
     }
 }
 
+var link = document.QuerySelectorAll("[class='card-mini _topnews']");
 
+
+
+
+
+
+var str1 = link.Select(el => el.GetAttribute("href")).ToList();
+
+
+
+
+
+
+
+
+
+
+
+str1.ForEach(Console.WriteLine);
 
 
 /*

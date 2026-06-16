@@ -1,8 +1,8 @@
 {
   "Url": "https://lenta.ru",
-  "MainSelector": ".card-mini",
+  "MainSelector": ".card-mini._topnews",
   "Fields": [
-    { "Name": "Title", "Selector": ".card-mini__title a","Attribute": "href" },
-    { "Name": "Time", "Selector": "[class='card-mini__info-item']","Attribute": "" }
+    { "Name": "Title", "Selector": ".card-mini__title","Attribute": "" },
+    { "Name": "Time", "Selector": "","Attribute": "href" }
   ]
 }
