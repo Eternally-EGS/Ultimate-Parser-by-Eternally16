@@ -1,14 +1,14 @@
 
 public class FieldConfig
 {
-    public string Name {get; set;}
-    public string Selector {get; set;}
-    public string Attribute {get; set;}
+    public string Name {get; set;} = string.Empty;
+    public string Selector {get; set;} = string.Empty;
+    public string? Attribute {get; set;}
 }
 
 public class ParserConfig {
-    public string Url {get; set;}
-    public List<FieldConfig> Fields {get; set;}
-    public string MainSelector {get; set;}
+    public string Url {get; set;} = string.Empty;
+    public List<FieldConfig> Fields {get; set;} = new List<FieldConfig>();
+    public string MainSelector {get; set;} = string.Empty;
 }
 

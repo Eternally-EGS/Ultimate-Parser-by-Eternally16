@@ -30,11 +30,11 @@ var results = new List<Dictionary<string,string>>();
 foreach(var item in items) {
     var row = new Dictionary<string,string>();
 
-    foreach(var field0 in config.Fields) {
+    foreach(var field0 in config?.Fields ?? new List<FieldConfig>()) {
 
         string localName = field0.Name;
         string localSelector = field0.Selector;
-        string localAttribute = field0.Attribute;
+        string localAttribute = field0?.Attribute ?? "";
 //Console.WriteLine($"ДО Атребут : {localAttribute ?? "NULL"} ");
         var element = item.QuerySelector(localSelector);
 //Console.WriteLine($"ПОЧЬТИ  Атребут : {localAttribute ?? "NULL"} ");
@@ -42,23 +42,22 @@ foreach(var item in items) {
 //Console.WriteLine($"ПОСЛЕ Атребут : {localAttribute ?? "NULL"} ");
         string value;
         if(!string.IsNullOrEmpty(localAttribute)) {
-            value = element.GetAttribute(localAttribute);
+            value = element?.GetAttribute(localAttribute) ?? "";
         } else 
             value = element.TextContent.Trim();
 
         row[localName] = value ?? "";
-        
     }
 results.Add(row);
 
 }
 
 
-var header = config.Fields.Select(el => el.Name).ToList();
+var header = config?.Fields?.Select(el => el.Name).ToList() ?? new List<string>();
 
 
 foreach (var row in results) {
-    foreach(var field in config.Fields){
+    foreach(var field in config?.Fields ?? new List<FieldConfig>()){
         string value = row.ContainsKey(field.Name) ? row[field.Name] : "";
         Console.WriteLine($"{field.Name}: {value}");
     }
