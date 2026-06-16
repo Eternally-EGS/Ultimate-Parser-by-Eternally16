@@ -2,124 +2,87 @@
 using AngleSharp.Dom;
 using System.IO;
 using System.Text;
+using System.Text.Json;
 
+//Json reading
+string jsonstr = File.ReadAllText("config.json");
+var config = JsonSerializer.Deserialize<ParserConfig>(jsonstr);
+
+string url = config?.Url ?? "";
 
 // Default config settings
-var config = Configuration.Default.WithDefaultLoader();
+var configstr = Configuration.Default.WithDefaultLoader();
 
 // Creating browser
-var context = BrowsingContext.New(config);
-
-string url = "https://lenta.ru";
+var context = BrowsingContext.New(configstr);
 
 // Create base page
 var document = await context.OpenAsync(url);
 
-var titles = document.QuerySelectorAll("[class='card-mini__title']");
-var link = document.QuerySelectorAll("[class='card-mini _topnews']");
-var time = document.QuerySelectorAll("[class='card-mini__info-item']");
+// Parsing and reading json
+
+var items = document.QuerySelectorAll(config?.MainSelector ?? ".card-mini");
+var results = new List<Dictionary<string,string>>();
 
 
-var str0 = titles.Select(el => el.TextContent.Trim()).ToList();
-var str1 = link.Select(el => el.GetAttribute("href") ?? "Нет ссылки").ToList();
-var str2 = time.Select(el => el.TextContent.Trim()).ToList();
 
-str0.AddRange(str1);
-str0.AddRange(str2);
+// Main parsing 
+foreach(var item in items) {
+    var row = new Dictionary<string,string>();
+
+    foreach(var field0 in config.Fields) {
+
+        string localName = field0.Name;
+        string localSelector = field0.Selector;
+        string localAttribute = field0.Attribute;
+//Console.WriteLine($"ДО Атребут : {localAttribute ?? "NULL"} ");
+        var element = item.QuerySelector(localSelector);
+//Console.WriteLine($"ПОЧЬТИ  Атребут : {localAttribute ?? "NULL"} ");
+        if (element == null) { continue; }
+//Console.WriteLine($"ПОСЛЕ Атребут : {localAttribute ?? "NULL"} ");
+        string value;
+        if(!string.IsNullOrEmpty(localAttribute)) {
+            value = element.GetAttribute(localAttribute);
+        } else 
+            value = element.TextContent.Trim();
+
+        row[localName] = value ?? "";
+        
+    }
+results.Add(row);
+
+}
 
 
-//str0.ForEach(Console.WriteLine);
+var header = config.Fields.Select(el => el.Name).ToList();
 
-//Console.WriteLine($"{"Titles",-40} | {"links",-60} | {"Time",-20}");
-File.WriteAllLines("Out.txt",str0);
 
-using(var writer = new StreamWriter("Out.csv",false,Encoding.UTF8)){
-    writer.WriteLine("Titles,Links,Times");
-    for(int i = 0;i< titles.Count;i++){
-        writer.WriteLine($"\"{str0[i]}\",\"{url + str1[i]}\",\"{str2[i]}\"");
+foreach (var row in results) {
+    foreach(var field in config.Fields){
+        string value = row.ContainsKey(field.Name) ? row[field.Name] : "";
+        Console.WriteLine($"{field.Name}: {value}");
     }
 }
 
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 /*
-
-// Parsing point
-var titles = document.QuerySelectorAll("[class='card-mini__title']");
-var titlesBig = document.QuerySelectorAll("[class='card-big__title']");
-var link = document.QuerySelectorAll("[class='card-mini _topnews']");
-
-var links = link.Select(element => element.GetAttribute("href")).ToList() ;
-
-
-links.ForEach(Console.WriteLine);
-File.WriteAllLines("Out.txt",links);
-
-
-
-/*
-
-// Create list
-var EndList = titles
-.Select(el => el.TextContent.Trim())
-.ToList();
-
-var EndList0 = titlesBig
-.Select(el => el.TextContent.Trim())
-.ToList();
-
-
-// Output
-//var text1 = $"количество заголовков: {titles.Length}";
-//var text2 = $"количество заголовков (Больших): {titlesBig.Length}";
-
-//EndList.Insert(0,text1);
-//EndList0.Insert(0,text2);
-
-//EndList.AddRange(EndList0);
-
-//File.WriteAllLines("Out.txt",EndList);
-
-
-
-
-
-foreach(var tit in titles){
-    Console.WriteLine(tit.TextContent.Trim());
-
-}
-
-foreach(var titBig in titlesBig){
-    Console.WriteLine(titBig.TextContent.Trim());
-
+using(var writer = new StreamWriter("Out.csv",false,Encoding.UTF8)){
+    writer.WriteLine("Titles");
+    for(int i = 0;i < titles.Count;i++){
+        writer.WriteLine($"\"{str0[i]}\"");
+    }
 }
 */
+
+
+
+
+
+
+
+
 
 
 
