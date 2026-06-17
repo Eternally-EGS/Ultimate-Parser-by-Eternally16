@@ -3,6 +3,6 @@
   "MainSelector": ".card-mini._topnews",
   "Fields": [
     { "Name": "Title", "Selector": ".card-mini__title","Attribute": "" },
-    { "Name": "Time", "Selector": "","Attribute": "href" }
+    { "Name": "Time", "Selector": "","Attribute": "href", "Flags": [1] }
   ]
 }

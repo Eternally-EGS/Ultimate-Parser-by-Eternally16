@@ -123,6 +123,19 @@ foreach(var item in items!) {
             value = element.TextContent.Trim();
         }
 
+        // Flags system
+
+        // Full Link 
+        if (field0!.Flags != null && field0.Flags.Contains(1)){
+            if (!string.IsNullOrEmpty(value) && value.StartsWith("/")){
+                value = new Uri(new Uri(config?.Url ?? ""),value).ToString();
+            }
+        }
+
+
+
+
+
         row[localName] = value ?? "";
     }
 
