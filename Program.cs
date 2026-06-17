@@ -8,6 +8,7 @@ using System.Text.Json;
 string jsonstr = File.ReadAllText("config.json");
 var config = JsonSerializer.Deserialize<ParserConfig>(jsonstr);
 
+// URL Get
 string url = config?.Url ?? "";
 
 // Default config settings
@@ -24,8 +25,6 @@ var document = await context.OpenAsync(url);
 var items = document.QuerySelectorAll(config?.MainSelector ?? ".card-mini");
 var results = new List<Dictionary<string,string>>();
 
-
-
 // Main parsing 
 foreach(var item in items) {
     var row = new Dictionary<string,string>();
@@ -40,9 +39,10 @@ foreach(var item in items) {
         if (element == null) { continue; }
 
         string value;
-        if(!string.IsNullOrEmpty(localAttribute)) {
+        // Attribute check
+        if(!string.IsNullOrEmpty(localAttribute)) 
             value = element?.GetAttribute(localAttribute) ?? "";
-        } else 
+        else 
             value = element.TextContent.Trim();
 
         row[localName] = value ?? "";
@@ -51,20 +51,17 @@ results.Add(row);
 
 }
 
-
+// Console Output
 var header = config?.Fields?.Select(el => el.Name).ToList() ?? new List<string>();
-
 
 foreach (var row in results) {
     foreach(var field in config?.Fields ?? new List<FieldConfig>()){
-
-        // Console
         string value = row.ContainsKey(field.Name) ? row[field.Name] : "";
         Console.WriteLine($"{field.Name}: {value}");
     }
 }
 
-// CSV
+// CSV Export
         using(var writer = new StreamWriter("Out.csv",false,Encoding.UTF8)){
             writer.WriteLine(string.Join(";",header));
 

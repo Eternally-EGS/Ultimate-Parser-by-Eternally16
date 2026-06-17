@@ -1,4 +1,5 @@
 
+// Css Selector and attribute
 public class FieldConfig
 {
     public string Name {get; set;} = string.Empty;
@@ -6,6 +7,7 @@ public class FieldConfig
     public string? Attribute {get; set;}
 }
 
+// Main setting
 public class ParserConfig {
     public string Url {get; set;} = string.Empty;
     public List<FieldConfig> Fields {get; set;} = new List<FieldConfig>();
