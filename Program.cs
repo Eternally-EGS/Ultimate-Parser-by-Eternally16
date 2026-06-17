@@ -4,6 +4,19 @@ using System.IO;
 using System.Text;
 using System.Text.Json;
 
+// Error outout
+static void ConsoleOutput(string message,int color) {
+    var colors = ConsoleColor.White;
+    switch (color) {
+    case 0: colors = ConsoleColor.Red; break;
+        case 1: colors = ConsoleColor.Yellow; break;
+            case 2: colors = ConsoleColor.Cyan; break;
+    }
+    Console.ForegroundColor = colors;
+    Console.WriteLine(message);
+    Console.ResetColor();
+}
+
 //Json reading
 ParserConfig? config = null;
 
@@ -11,6 +24,7 @@ try {
     string jsonstr = File.ReadAllText("config.json");
     config = JsonSerializer.Deserialize<ParserConfig>(jsonstr);
 } catch 
+
 {
     ConsoleOutput("Config.json не найден или пустой!!!",0);    
     return;
@@ -19,41 +33,25 @@ try {
 // Validation and security
 
 // URL
-if (string.IsNullOrEmpty(config.Url)){
-    ConsoleOutput("URL не найден!!!",0);    
+if (string.IsNullOrEmpty(config?.Url ?? "")){
+    ConsoleOutput("URL не найден или пустой !!!",0);    
     return;
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// Error outout
-static void ConsoleOutput(string message,int color) {
-    var colors = ConsoleColor.White;
-    switch (color) {
-    case 0: colors = ConsoleColor.Red; break;
-        case 1: colors = ConsoleColor.Yellow; break;
-            case 2: colors = ConsoleColor.Green; break;
-    }
-    Console.ForegroundColor = colors;
-    Console.WriteLine(message);
-    Console.ResetColor();
+// Main selector
+if (string.IsNullOrEmpty(config?.MainSelector ?? "")){
+    ConsoleOutput("Main selector не найден или пустой !!!",0);    
+    return;
 }
 
+// Fields
+if (config?.Fields.Count == 0 || config?.Fields == null){
+    ConsoleOutput("Fields не найдены !!!",0);    
+    return;
+}
+
+ConsoleOutput($"Проверка файла успешно !!! URL: {config.Url}",2);
+ConsoleOutput($"Ищем элеиенты по: {config.MainSelector}",2);
 
 
 // URL Get
@@ -61,17 +59,32 @@ string url = config?.Url ?? "";
 
 // Default config settings
 var configstr = Configuration.Default.WithDefaultLoader();
-
-// Creating browser
 var context = BrowsingContext.New(configstr);
 
+IDocument? document = null;
+
+try {
 // Create base page
-var document = await context.OpenAsync(url);
+    ConsoleOutput("Подключение...",2);
+    document = await context.OpenAsync(url);
+} catch (Exception ex)
+
+{
+ConsoleOutput($"Ошибка подключния к: {config?.Url ?? ""} : {ex}",0);
+}
 
 // Parsing and reading json
 
-var items = document.QuerySelectorAll(config?.MainSelector ?? ".card-mini");
+var items = document?.QuerySelectorAll(config?.MainSelector ?? ".card-mini");
 var results = new List<Dictionary<string,string>>();
+
+if (items?.Count == 0 || items == null) {
+    ConsoleOutput($"Элементы по MainSelector: {config?.MainSelector ?? ".card-mini"} не найдены !!!",0);    
+    return;
+}
+
+ConsoleOutput($"Найдено элементов: {items?.Count}",2);
+ConsoleOutput("Начало прасинга...",2);
 
 // Main parsing 
 foreach(var item in items) {

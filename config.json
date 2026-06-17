@@ -1,5 +1,5 @@
 {
-  "Url": "",
+  "Url": "https://lenta.ru",
   "MainSelector": ".card-mini._topnews",
   "Fields": [
     { "Name": "Title", "Selector": ".card-mini__title","Attribute": "" },
