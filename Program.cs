@@ -132,10 +132,6 @@ foreach(var item in items!) {
             }
         }
 
-
-
-
-
         row[localName] = value ?? "";
     }
 
