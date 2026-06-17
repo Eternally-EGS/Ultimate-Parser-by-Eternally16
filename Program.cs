@@ -125,13 +125,31 @@ foreach(var item in items!) {
 
         // Flags system
 
-        // Full Link 
-        if (field0!.Flags != null && field0.Flags.Contains(1)){
-            if (!string.IsNullOrEmpty(value) && value.StartsWith("/")){
-                value = new Uri(new Uri(config?.Url ?? ""),value).ToString();
-            }
+        if (!string.IsNullOrEmpty(value) && field0!.Flags != null){
+
+        // Full Link 1
+        if (field0.Flags.Contains(1)){
+            if (value.StartsWith("/"))
+                value = new Uri(new Uri(config?.Url ?? ""),value).ToString();    
         }
 
+        // Trim 2
+        if (field0.Flags.Contains(2)){
+                value = value.Trim();
+        }
+
+        // Link Cleanup 3
+        if (field0.Flags.Contains(3)){
+                int index = value.IndexOf("?");
+                if (index != -1) { value = value.Substring(0,index); }
+        }
+
+        // Data and time reload 4
+        if (field0.Flags.Contains(4)){
+            if (DateTime.TryParse(value,out DateTime date)) 
+                value = date.ToString("yyyy-MM-dd");
+        }
+    }
         row[localName] = value ?? "";
     }
 
