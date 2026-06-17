@@ -97,20 +97,33 @@ foreach(var item in items) {
         string localAttribute = field0?.Attribute ?? "";
         
         var element = string.IsNullOrEmpty(localSelector) ? item : item.QuerySelector(localSelector);
-        if (element == null) { continue; }
+        if (element == null) { 
+        ConsoleOutput($"Элемент: {field0?.Name ?? ""} не найден ",1);    
+        continue; }
 
         string value;
         // Attribute check
-        if(!string.IsNullOrEmpty(localAttribute)) 
+        if(!string.IsNullOrEmpty(localAttribute)) {
             value = element?.GetAttribute(localAttribute) ?? "";
-        else 
+            
+            if (string.IsNullOrEmpty(value)){
+                ConsoleOutput($"Элемент: {localName} Не найден атребут: {localAttribute}",1);
+                row[localName] = "";
+                continue;
+            }
+        
+        } else {
             value = element.TextContent.Trim();
+        }
 
         row[localName] = value ?? "";
     }
+
 results.Add(row);
 
 }
+
+ConsoleOutput("Успешно !!!",2);
 
 // Console Output
 var header = config?.Fields?.Select(el => el.Name).ToList() ?? new List<string>();
@@ -132,6 +145,7 @@ foreach (var row in results) {
             }
         }
 
+ConsoleOutput("Покеда !",2);
 
 
 
