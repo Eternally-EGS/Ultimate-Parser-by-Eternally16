@@ -4,6 +4,10 @@ using System.IO;
 using System.Text;
 using System.Text.Json;
 
+class UltimateParser 
+{
+static List<string> LogFile = new List<string>();
+
 // Error outout
 static void ConsoleOutput(string message,int color) {
     var colors = ConsoleColor.White;
@@ -13,9 +17,12 @@ static void ConsoleOutput(string message,int color) {
             case 2: colors = ConsoleColor.Cyan; break;
     }
     Console.ForegroundColor = colors;
-    Console.WriteLine(message);
+    Console.WriteLine(message +"  "+ DateTime.Now);
     Console.ResetColor();
+    LogFile.Add(message +"  "+ DateTime.Now);
 }
+
+static async Task Main(string[] args)  {
 
 //Json reading
 ParserConfig? config = null;
@@ -45,13 +52,13 @@ if (string.IsNullOrEmpty(config?.MainSelector ?? "")){
 }
 
 // Fields
-if (config?.Fields.Count == 0 || config?.Fields == null){
+if (config?.Fields == null || config?.Fields.Count == 0 ){
     ConsoleOutput("Fields не найдены !!!",0);    
     return;
 }
 
-ConsoleOutput($"Проверка файла успешно !!! URL: {config.Url}",2);
-ConsoleOutput($"Ищем элеиенты по: {config.MainSelector}",2);
+ConsoleOutput($"Проверка файла успешно !!! URL: {config?.Url ?? ""}",2);
+ConsoleOutput($"Ищем элеиенты по: {config?.MainSelector ?? ".mini_card"}",2);
 
 
 // URL Get
@@ -78,7 +85,7 @@ ConsoleOutput($"Ошибка подключния к: {config?.Url ?? ""} : {ex}
 var items = document?.QuerySelectorAll(config?.MainSelector ?? ".card-mini");
 var results = new List<Dictionary<string,string>>();
 
-if (items?.Count == 0 || items == null) {
+if (items == null || items.Count == 0) {
     ConsoleOutput($"Элементы по MainSelector: {config?.MainSelector ?? ".card-mini"} не найдены !!!",0);    
     return;
 }
@@ -87,7 +94,7 @@ ConsoleOutput($"Найдено элементов: {items?.Count}",2);
 ConsoleOutput("Начало прасинга...",2);
 
 // Main parsing 
-foreach(var item in items) {
+foreach(var item in items!) {
     var row = new Dictionary<string,string>();
 
     foreach(var field0 in config?.Fields ?? new List<FieldConfig>()) {
@@ -145,15 +152,14 @@ foreach (var row in results) {
             }
         }
 
+ConsoleOutput("Лог файл ProgramLog.txt сохранен в директории проекта !",2);
 ConsoleOutput("Покеда !",2);
 
+// Log file
+File.WriteAllLines("ProgramLog.txt",LogFile);
 
+}
 
-
-
-
-
-
-
+}
 
 
