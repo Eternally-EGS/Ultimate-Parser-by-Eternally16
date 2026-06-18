@@ -1,8 +1,10 @@
 ﻿using AngleSharp;
+using AngleSharp.Io;
 using AngleSharp.Dom;
 using System.IO;
 using System.Text;
 using System.Text.Json;
+using AngleSharp.Io.Network;
 
 class UltimateParser 
 {
@@ -62,7 +64,17 @@ ConsoleOutput($"Проверка файла успешно !!! URL: {config?.Url
 ConsoleOutput($"Ищем элеиенты по: {config?.MainSelector ?? ".mini_card"}",2);
 
 // Default config settings
-var configstr = Configuration.Default.WithDefaultLoader();
+var HTTPClient = new HttpClient();
+var req = new DefaultHttpRequester();
+
+HTTPClient.Timeout = TimeSpan.FromSeconds(60);
+req.Headers["User-Agent"] = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36";
+
+var configstr = Configuration.Default
+    .WithRequester(new HttpClientRequester(HTTPClient))
+    .WithDefaultLoader()
+    .WithRequesters();
+    
 var context = BrowsingContext.New(configstr);
 
 
