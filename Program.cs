@@ -158,12 +158,15 @@ foreach(var item in items!) {
 results.Add(row);
 
 }
+
+await Task.Delay(2000);
 }
 
 ConsoleOutput("Успешно !!!",2);
 
+
+/*
 // Console Output
-var header = config?.Fields?.Select(el => el.Name).ToList() ?? new List<string>();
 
 foreach (var row in results) {
     foreach(var field in config?.Fields ?? new List<FieldConfig>()){
@@ -172,7 +175,12 @@ foreach (var row in results) {
     }
 }
 
+*/
+
 // CSV Export
+
+var header = config?.Fields?.Select(el => el.Name).ToList() ?? new List<string>();
+
         using(var writer = new StreamWriter("Out.csv",false,Encoding.UTF8)){
             writer.WriteLine(string.Join(";",header));
 
