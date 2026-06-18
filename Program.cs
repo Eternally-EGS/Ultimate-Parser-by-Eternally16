@@ -67,14 +67,14 @@ ConsoleOutput($"Ищем элеиенты по: {config?.MainSelector ?? ".mini_
 var HTTPClient = new HttpClient();
 var req = new DefaultHttpRequester();
 
-HTTPClient.Timeout = TimeSpan.FromSeconds(60);
-req.Headers["User-Agent"] = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36";
+HTTPClient.Timeout = TimeSpan.FromSeconds(10);
+req.Headers["User-Agent"] = config?.UserAgent ?? "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36";
 
 var configstr = Configuration.Default
     .WithRequester(new HttpClientRequester(HTTPClient))
     .WithDefaultLoader()
     .WithRequesters();
-    
+
 var context = BrowsingContext.New(configstr);
 
 
