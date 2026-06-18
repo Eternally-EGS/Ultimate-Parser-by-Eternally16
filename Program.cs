@@ -61,38 +61,39 @@ if (config?.Fields == null || config?.Fields.Count == 0 ){
 ConsoleOutput($"Проверка файла успешно !!! URL: {config?.Url ?? ""}",2);
 ConsoleOutput($"Ищем элеиенты по: {config?.MainSelector ?? ".mini_card"}",2);
 
-
-// URL Get
-string url = config?.Url ?? "";
-
 // Default config settings
 var configstr = Configuration.Default.WithDefaultLoader();
 var context = BrowsingContext.New(configstr);
+
+
+// Parsing and reading json
+
+var results = new List<Dictionary<string,string>>();
+
+for (var i = 1;i<= config?.Pages;i++) {
+
+// Pages select
+
+string url = config.Url.Replace("{Page}",i.ToString());
 
 IDocument? document = null;
 
 try {
 // Create base page
-    ConsoleOutput("Подключение...",2);
+    ConsoleOutput($"Подключение... к: {url}",2);
     document = await context.OpenAsync(url);
 } catch (Exception ex)
-
 {
-ConsoleOutput($"Ошибка подключния к: {config?.Url ?? ""} : {ex}",0);
+ConsoleOutput($"Ошибка подключния к: {config?.Url ?? ""} : {ex}",1);
+continue;
 }
 
-// Parsing and reading json
-
-var items = document?.QuerySelectorAll(config?.MainSelector ?? ".card-mini");
-var results = new List<Dictionary<string,string>>();
+var items = document?.QuerySelectorAll(config?.MainSelector ?? "");
 
 if (items == null || items.Count == 0) {
-    ConsoleOutput($"Элементы по MainSelector: {config?.MainSelector ?? ".card-mini"} не найдены !!!",0);    
-    return;
+    ConsoleOutput($"Элементы по MainSelector: {config?.MainSelector ?? ""} не найдены !!!",1);    
+    continue;
 }
-
-ConsoleOutput($"Найдено элементов: {items?.Count}",2);
-ConsoleOutput("Начало прасинга...",2);
 
 // Main parsing 
 foreach(var item in items!) {
@@ -157,6 +158,7 @@ foreach(var item in items!) {
 results.Add(row);
 
 }
+}
 
 ConsoleOutput("Успешно !!!",2);
 
@@ -179,8 +181,11 @@ foreach (var row in results) {
                 writer.WriteLine(string.Join(";",value.Select(v => $"\"{v}\"")));
             }
         }
-ConsoleOutput("Успешно сохранено в CSV !!!",2);
 
+
+
+        
+ConsoleOutput("Успешно сохранено в CSV !!!",2);
 ConsoleOutput("Лог файл ProgramLog.txt сохранен в директории проекта !",2);
 ConsoleOutput("Покеда !",2);
 }
