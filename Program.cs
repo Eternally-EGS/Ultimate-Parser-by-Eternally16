@@ -3,79 +3,29 @@ using AngleSharp.Io;
 using AngleSharp.Dom;
 using System.IO;
 using System.Text;
-using System.Text.Json;
 using AngleSharp.Io.Network;
+using UltimateParser.Config;
+using UltimateParser.Utils;
 
-class UltimateParser 
+class UltimateParser_Main 
 {
-static List<string> LogFile = new List<string>();
-
-// Error output
-static void ConsoleOutput(string message,int color) {
-    var colors = ConsoleColor.White;
-    switch (color) {
-    case 0: colors = ConsoleColor.Red; break;
-        case 1: colors = ConsoleColor.Yellow; break;
-            case 2: colors = ConsoleColor.Cyan; break;
-    }
-    Console.ForegroundColor = colors;
-    Console.WriteLine(message +"  "+ DateTime.Now);
-    Console.ResetColor();
-    LogFile.Add(message +"  "+ DateTime.Now);
-    // Log file
-    File.WriteAllLines("ProgramLog.txt",LogFile);
-}
-
 static async Task Main(string[] args)  {
 
-//Json reading
-ParserConfig? config = null;
+ParserConfig config = ConfigLoader.GetConfig("config.json");
 
-try {
-    string jsonstr = File.ReadAllText("config.json");
-    config = JsonSerializer.Deserialize<ParserConfig>(jsonstr);
-} catch 
-{
-    ConsoleOutput("Config.json не найден или пустой!!!",0);    
-    return;
-}
+bool isValid = Validator.GetValidator(config);
 
-// Validation and security
 
-// URL
-if (string.IsNullOrEmpty(config?.Url ?? "")){
-    ConsoleOutput("URL не найден или пустой !!!",0);    
-    return;
-}
 
-// Main selector
-if (string.IsNullOrEmpty(config?.MainSelector ?? "")){
-    ConsoleOutput("Main selector не найден или пустой !!!",0);    
-    return;
-}
 
-// Fields
-if (config?.Fields == null || config?.Fields.Count == 0 ){
-    ConsoleOutput("Fields не найдены !!!",0);    
-    return;
-}
 
-ConsoleOutput($"Проверка файла успешно !!! URL: {config?.Url ?? ""}",2);
-ConsoleOutput($"Ищем элеиенты по: {config?.MainSelector ?? ".mini_card"}",2);
 
-// Default config settings
-var HTTPClient = new HttpClient();
-var req = new DefaultHttpRequester();
 
-HTTPClient.Timeout = TimeSpan.FromSeconds(10);
-req.Headers["User-Agent"] = config?.UserAgent ?? "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36";
 
-var configstr = Configuration.Default
-    .WithRequester(new HttpClientRequester(HTTPClient))
-    .WithDefaultLoader()
-    .WithRequesters();
 
-var context = BrowsingContext.New(configstr);
+
+
+
 
 
 // Parsing and reading json
@@ -92,24 +42,24 @@ IDocument? document = null;
 
 try {
 // Create base page
-    ConsoleOutput($"Подключение... к: {url}",2);
-    document = await context.OpenAsync(url);
+    Logger.ConsoleOutput($"Подключение... к: {url}",2);
+    document = await PageLoader.GetPageAsync(url,config.UserAgent);
 } catch (Exception ex)
 {
-ConsoleOutput($"Ошибка подключния к: {config?.Url ?? ""} : {ex}",1);
+Logger.ConsoleOutput($"Ошибка подключния к: {config?.Url ?? ""} : {ex}",1);
 continue;
 }
 
-ConsoleOutput($"Страница: {i} загружена !!!",2); 
+Logger.ConsoleOutput($"Страница: {i} загружена !!!",2); 
 
 var items = document?.QuerySelectorAll(config?.MainSelector ?? "");
 
 if (items == null || items.Count == 0) {
-    ConsoleOutput($"Элементы по MainSelector: {config?.MainSelector ?? ""} не найдены !!!",1);    
+    Logger.ConsoleOutput($"Элементы по MainSelector: {config?.MainSelector ?? ""} не найдены !!!",1);    
     continue;
 } else {
 
-ConsoleOutput($"На странице: {i} найдено: {items.Count} элементов !!!",2); 
+Logger.ConsoleOutput($"На странице: {i} найдено: {items.Count} элементов !!!",2); 
 
 }
 
@@ -125,7 +75,7 @@ foreach(var item in items!) {
         
         var element = string.IsNullOrEmpty(localSelector) ? item : item.QuerySelector(localSelector);
         if (element == null) { 
-        ConsoleOutput($"Элемент: {field0?.Name ?? ""} не найден ",1);    
+        Logger.ConsoleOutput($"Элемент: {field0?.Name ?? ""} не найден ",1);    
         continue; }
 
         string value;
@@ -134,7 +84,7 @@ foreach(var item in items!) {
             value = element?.GetAttribute(localAttribute) ?? "";
             
             if (string.IsNullOrEmpty(value)){
-                ConsoleOutput($"Элемент: {localName} Не найден атребут: {localAttribute}",1);
+                Logger.ConsoleOutput($"Элемент: {localName} Не найден атребут: {localAttribute}",1);
                 row[localName] = "";
                 continue;
             }
@@ -180,7 +130,7 @@ results.Add(row);
 await Task.Delay(2000);
 }
 
-ConsoleOutput("Успешно !!!",2);
+Logger.ConsoleOutput("Успешно !!!",2);
 
 
 /*
@@ -196,7 +146,7 @@ foreach (var row in results) {
 */
 
 
-ConsoleOutput($"Всего элементов собрано: {results.Count} !!!",2); 
+Logger.ConsoleOutput($"Всего элементов собрано: {results.Count} !!!",2); 
 
 // CSV Export
 
@@ -214,9 +164,9 @@ var header = config?.Fields?.Select(el => el.Name).ToList() ?? new List<string>(
 
 
         
-ConsoleOutput("Успешно сохранено в CSV !!!",2);
-ConsoleOutput("Лог файл ProgramLog.txt сохранен в директории проекта !",2);
-ConsoleOutput("Покеда !",2);
+Logger.ConsoleOutput("Успешно сохранено в CSV !!!",2);
+Logger.ConsoleOutput("Лог файл ProgramLog.txt сохранен в директории проекта !",2);
+Logger.ConsoleOutput("Покеда !",2);
 }
 
 }

@@ -1,4 +1,6 @@
 
+namespace UltimateParser.Config {
+
 // Css Selector and attribute
 public class FieldConfig
 {
@@ -17,3 +19,4 @@ public class ParserConfig {
     public string UserAgent {get; set;} = string.Empty;
 }
 
+}
