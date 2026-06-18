@@ -88,11 +88,17 @@ ConsoleOutput($"Ошибка подключния к: {config?.Url ?? ""} : {ex}
 continue;
 }
 
+ConsoleOutput($"Страница: {i} загружена !!!",2); 
+
 var items = document?.QuerySelectorAll(config?.MainSelector ?? "");
 
 if (items == null || items.Count == 0) {
     ConsoleOutput($"Элементы по MainSelector: {config?.MainSelector ?? ""} не найдены !!!",1);    
     continue;
+} else {
+
+ConsoleOutput($"На странице: {i} найдено: {items.Count} элементов !!!",2); 
+
 }
 
 // Main parsing 
@@ -176,6 +182,9 @@ foreach (var row in results) {
 }
 
 */
+
+
+ConsoleOutput($"Всего элементов собрано: {results.Count} !!!",2); 
 
 // CSV Export
 
