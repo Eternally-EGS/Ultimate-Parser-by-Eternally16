@@ -38,6 +38,12 @@ namespace UltimateParser.Utils
                 return false;
             }
 
+            // ExportTo
+            if (config?.ExportTo == null) {
+                Logger.ConsoleOutput("ExportTo не найден или пустой !!!",0);    
+                return false;
+            }
+
         Logger.ConsoleOutput("Конфиг файл был усешно загружен!",2);
         return true;
         }

@@ -6,13 +6,15 @@ using UltimateParser.Utils;
 namespace UltimateParser.Engines 
 {
     public class AngelSharpEngien {
-
+        public event Action<List<Dictionary<string,string>>>? OnCheckpoint = null;
         public async Task<List<Dictionary<string,string>>> GetParse (ParserConfig config) {
             
             var results = new List<Dictionary<string,string>>();
 
             for (var i = 1;i<= config?.Pages;i++) {
 
+                // Buffer
+                OnCheckpoint?.Invoke(results);
             // Pages select
 
             string url = config.Url.Replace("{Page}",i.ToString());
