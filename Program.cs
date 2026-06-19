@@ -30,6 +30,8 @@ var engien = new AngelSharpEngien();
 engien.OnCheckpoint += (data) => SaveManager.GetSave(header,"Out.csv",data,config!,false,"");
 var result = await engien.GetParse(config!);
 
+Logger.ConsoleOutput($"Парсинг завершён найдено: {result.Count} элементов",2);
+
 // Protaction
 SaveManager.GetSave(header,CsvPath,result,config!,true,ExcelPath);
 
