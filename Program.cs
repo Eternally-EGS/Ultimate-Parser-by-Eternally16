@@ -9,9 +9,25 @@ using UltimateParser.Utils;
 using UltimateParser.Engines;
 using UltimateParser.Export;
 
+namespace UltimateParser {
+
 class UltimateParser_Main 
 {
+
+// Savty exit
+public static bool isExit = false;
+
+static void SetupExit() {
+    Console.CancelKeyPress += (sender,e) => {
+        e.Cancel = true;
+        isExit = true;
+        Logger.ConsoleOutput("Получен сигнал прерывания Выходим...",1);
+    };
+}
+
 static async Task Main(string[] args)  {
+
+SetupExit();
 
 string projectPath = Directory.GetParent(AppDomain.CurrentDomain.BaseDirectory)!.Parent!.Parent!.Parent!.FullName;
 string JsonPath = "Config.json";
@@ -33,12 +49,11 @@ var result = await engien.GetParse(config!);
 Logger.ConsoleOutput($"Парсинг завершён найдено: {result.Count} элементов",2);
 
 // Protaction
-SaveManager.GetSave(header,CsvPath,result,config!,true,ExcelPath);
-
+if (result.Count > 0) {
+    SaveManager.GetSave(header,CsvPath,result,config!,true,ExcelPath);
+}
 Logger.ConsoleOutput("Лог файл ProgramLog.txt сохранен в директории проекта !",2);
 Logger.ConsoleOutput("Покеда !",2);
+        }
+    }
 }
-
-}
-
-

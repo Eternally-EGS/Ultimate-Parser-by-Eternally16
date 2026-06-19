@@ -13,8 +13,11 @@ namespace UltimateParser.Engines
 
             for (var i = 1;i<= config?.Pages;i++) {
 
+                if (UltimateParser_Main.isExit) { break; }
+                
                 // Buffer
                 OnCheckpoint?.Invoke(results);
+
             // Pages select
 
             string url = config.Url.Replace("{Page}",i.ToString());
