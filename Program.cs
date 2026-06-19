@@ -13,7 +13,12 @@ class UltimateParser_Main
 {
 static async Task Main(string[] args)  {
 
-ParserConfig config = ConfigLoader.GetConfig("Config.json");
+string projectPath = Directory.GetParent(AppDomain.CurrentDomain.BaseDirectory)!.Parent!.Parent!.Parent!.FullName;
+string JsonPath = Path.Combine(projectPath,"Config.json");
+string CsvPath = Path.Combine(projectPath,"Out.csv");
+string ExcelPath = Path.Combine(projectPath,"Out.xlsx");
+
+ParserConfig config = ConfigLoader.GetConfig(JsonPath);
 
 bool isValid = Validator.GetValidator(config);
 if (!isValid) return;
@@ -22,11 +27,11 @@ if (!isValid) return;
 var header = config?.Fields?.Select(el => el.Name).ToList() ?? new List<string>();
 
 var engien = new AngelSharpEngien();
-engien.OnCheckpoint += (data) => SaveManager.GetSave(header,"Out.csv",data,config!);
+engien.OnCheckpoint += (data) => SaveManager.GetSave(header,"Out.csv",data,config!,false,"");
 var result = await engien.GetParse(config!);
 
 // Protaction
-SaveManager.GetSave(header,"Out.csv",result,config!);
+SaveManager.GetSave(header,CsvPath,result,config!,true,ExcelPath);
 
 Logger.ConsoleOutput("Лог файл ProgramLog.txt сохранен в директории проекта !",2);
 Logger.ConsoleOutput("Покеда !",2);
