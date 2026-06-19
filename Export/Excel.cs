@@ -31,6 +31,7 @@ namespace UltimateParser.Export
             using (var workbook = new XLWorkbook()) {
                 var works = workbook.Worksheets.Add("Data");
                 works.Cell(1,1).InsertTable(table);
+                works.Columns().AdjustToContents();
                 workbook.SaveAs(pathXL);
             }
 
