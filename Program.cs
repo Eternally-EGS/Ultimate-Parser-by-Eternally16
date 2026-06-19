@@ -14,7 +14,7 @@ class UltimateParser_Main
 static async Task Main(string[] args)  {
 
 string projectPath = Directory.GetParent(AppDomain.CurrentDomain.BaseDirectory)!.Parent!.Parent!.Parent!.FullName;
-string JsonPath = Path.Combine(projectPath,"Config.json");
+string JsonPath = "Config.json";
 string CsvPath = Path.Combine(projectPath,"Out.csv");
 string ExcelPath = Path.Combine(projectPath,"Out.xlsx");
 
