@@ -1,8 +1,9 @@
 using AngleSharp.Dom;
 using UltimateParser.Config;
+using UltimateParser.Parsers;
 using UltimateParser.Utils;
 
-namespace UltimateParser.Engiens 
+namespace UltimateParser.Engines 
 {
     public class AngelSharpEngien {
 
@@ -70,35 +71,12 @@ namespace UltimateParser.Engiens
                     } else {
                         value = element.TextContent.Trim();
                     }
+                    
+                    // Flag system
+                    string Endvalue = FlagSystem.GetFlag(value,field0!,url);
 
-                    // Flags system
 
-                    if (!string.IsNullOrEmpty(value) && field0!.Flags != null){
-
-                    // Full Link 1
-                    if (field0.Flags.Contains(1)){
-                        if (value.StartsWith("/"))
-                            value = new Uri(new Uri(config?.Url ?? ""),value).ToString();    
-                    }
-
-                    // Trim 2
-                    if (field0.Flags.Contains(2)){
-                            value = value.Trim();
-                    }
-
-                    // Link Cleanup 3
-                    if (field0.Flags.Contains(3)){
-                            int index = value.IndexOf("?");
-                            if (index != -1) { value = value.Substring(0,index); }
-                    }
-
-                    // Data and time reload 4
-                    if (field0.Flags.Contains(4)){
-                        if (DateTime.TryParse(value,out DateTime date)) 
-                            value = date.ToString("yyyy-MM-dd");
-                    }
-                }
-                    row[localName] = value ?? "";
+                    row[localName] = Endvalue ?? "";
                 }
 
             results.Add(row);
