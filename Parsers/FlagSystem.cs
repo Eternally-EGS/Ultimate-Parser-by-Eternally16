@@ -3,7 +3,6 @@ using UltimateParser.Config;
 namespace UltimateParser.Parsers 
 {
     public class FlagSystem {
-
         public static string GetFlag (string value,FieldConfig field,string Baseurl) {
         
             // Flags system
@@ -32,7 +31,6 @@ namespace UltimateParser.Parsers
                         value = date.ToString("yyyy-MM-dd");
                 }
             }
-
             return value;
         }
     }

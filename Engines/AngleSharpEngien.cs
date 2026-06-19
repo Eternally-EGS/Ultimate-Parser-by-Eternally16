@@ -18,13 +18,13 @@ namespace UltimateParser.Engines
             string url = config.Url.Replace("{Page}",i.ToString());
 
             IDocument? document = null;
-
-            try {
+            
             // Create base page
+            try {
                 Logger.ConsoleOutput($"Подключение... к: {url}",2);
                 document = await PageLoader.GetPageAsync(url,config.UserAgent);
-            } catch (Exception ex)
-            {
+            } 
+            catch (Exception ex) {
             Logger.ConsoleOutput($"Ошибка подключния к: {config?.Url ?? ""} : {ex}",1);
             continue;
             }
@@ -37,9 +37,7 @@ namespace UltimateParser.Engines
                 Logger.ConsoleOutput($"Элементы по MainSelector: {config?.MainSelector ?? ""} не найдены !!!",1);    
                 continue;
             } else {
-
             Logger.ConsoleOutput($"На странице: {i} найдено: {items.Count} элементов !!!",2); 
-
             }
 
             // Main parsing 
@@ -75,12 +73,10 @@ namespace UltimateParser.Engines
                     // Flag system
                     string Endvalue = FlagSystem.GetFlag(value,field0!,url);
 
-
                     row[localName] = Endvalue ?? "";
                 }
 
             results.Add(row);
-
             }
 
             await Task.Delay(2000);
