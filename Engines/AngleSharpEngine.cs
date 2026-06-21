@@ -75,7 +75,7 @@ namespace UltimateParser.Engines
 
                     // Flag 5 Xpath  !!
                     if (field0!.Flags.Contains(5)) {
-                        if (string.IsNullOrEmpty(localSelector)) {
+                        if (!string.IsNullOrEmpty(localSelector)) {
 
                             if(!localSelector.StartsWith(".")) localSelector = "." + localSelector;
                             element = item.SelectSingleNode(localSelector) as IElement;
