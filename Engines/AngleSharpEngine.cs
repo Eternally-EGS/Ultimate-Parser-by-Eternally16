@@ -3,6 +3,8 @@ using UltimateParser.Config;
 using UltimateParser.Parsers;
 using UltimateParser.Utils;
 using HtmlAgilityPack;
+using ClosedXML.Excel;
+using AngleSharp.XPath;
 
 namespace UltimateParser.Engines 
 {
@@ -36,17 +38,27 @@ namespace UltimateParser.Engines
             continue;
             }
 
-
             Logger.ConsoleOutput($"Страница: {i} загружена !!!",2); 
 
-            // Xpath suport
-            var items = document?.QuerySelectorAll(config?.MainSelector ?? "");
+            IEnumerable<IElement> items;
 
-            if (items == null || items.Count == 0) {
+            // Xpath suport
+            
+            if (config.MainSelectorType == "XPath") {
+                var nodes = document.DocumentElement.SelectNodes(config?.MainSelector ?? "");
+                items = nodes.OfType<IElement>().ToList();
+            }
+            else {
+                items = document.QuerySelectorAll(config?.MainSelector ?? "");
+            }
+            
+            int itemCount = items?.Count() ?? 0;
+            
+            if (items == null || itemCount == 0) {
                 Logger.ConsoleOutput($"Элементы по MainSelector: {config?.MainSelector ?? ""} не найдены !!!",1);    
                 continue;
             } else {
-            Logger.ConsoleOutput($"На странице: {i} найдено: {items.Count} элементов !!!",2); 
+                Logger.ConsoleOutput($"На странице: {i} найдено: {itemCount} элементов !!!",2); 
             }
 
             // Main parsing 
@@ -59,7 +71,21 @@ namespace UltimateParser.Engines
                     string localSelector = field0.Selector;
                     string localAttribute = field0?.Attribute ?? "";
                     
-                    var element = string.IsNullOrEmpty(localSelector) ? item : item.QuerySelector(localSelector);
+                   IElement? element = null;
+
+                    // Flag 5 Xpath  !!
+                    if (field0!.Flags.Contains(5)) {
+                        if (string.IsNullOrEmpty(localSelector)) {
+
+                            if(!localSelector.StartsWith(".")) localSelector = "." + localSelector;
+                            element = item.SelectSingleNode(localSelector) as IElement;
+                        }
+
+
+                    } else {
+                    element = string.IsNullOrEmpty(localSelector) ? item : item.QuerySelector(localSelector);
+                    }
+
                     if (element == null) { 
                     Logger.ConsoleOutput($"Элемент: {field0?.Name ?? ""} не найден ",1);    
                     continue; }
