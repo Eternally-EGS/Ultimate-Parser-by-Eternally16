@@ -16,6 +16,7 @@ namespace UltimateParser.Config {
         public string Url {get; set;} = string.Empty;
         public List<FieldConfig> Fields {get; set;} = new List<FieldConfig>();
         public string MainSelector {get; set;} = string.Empty;
+        public string MainSelectorType {get; set;} = string.Empty;
         public int Pages {get; set;} = 0;
         public string UserAgent {get; set;} = string.Empty;
     }

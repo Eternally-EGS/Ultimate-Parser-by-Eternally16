@@ -2,10 +2,11 @@ using AngleSharp.Dom;
 using UltimateParser.Config;
 using UltimateParser.Parsers;
 using UltimateParser.Utils;
+using HtmlAgilityPack;
 
 namespace UltimateParser.Engines 
 {
-    public class AngelSharpEngien {
+    public class AngelSharpEngine {
         public event Action<List<Dictionary<string,string>>>? OnCheckpoint = null;
         public async Task<List<Dictionary<string,string>>> GetParse (ParserConfig config) {
             
@@ -13,6 +14,7 @@ namespace UltimateParser.Engines
 
             for (var i = 1;i<= config?.Pages;i++) {
 
+                // save and exit
                 if (UltimateParser_Main.isExit) { break; }
                 
                 // Buffer
@@ -34,8 +36,10 @@ namespace UltimateParser.Engines
             continue;
             }
 
+
             Logger.ConsoleOutput($"Страница: {i} загружена !!!",2); 
 
+            // Xpath suport
             var items = document?.QuerySelectorAll(config?.MainSelector ?? "");
 
             if (items == null || items.Count == 0) {
