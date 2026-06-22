@@ -1,4 +1,6 @@
 
+using DocumentFormat.OpenXml.Wordprocessing;
+
 namespace UltimateParser.Config {
 
     // Css Selector and attribute
@@ -18,6 +20,8 @@ namespace UltimateParser.Config {
         public string MainSelector {get; set;} = string.Empty;
         public string MainSelectorType {get; set;} = string.Empty;
         public int Pages {get; set;} = 0;
+        public List<string> Proxies {get; set;} = new List<string>();
+        public bool UseProxy {get; set;} = false;
         public string UserAgent {get; set;} = string.Empty;
     }
 
