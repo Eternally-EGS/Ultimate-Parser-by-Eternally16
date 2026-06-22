@@ -9,6 +9,7 @@ namespace UltimateParser.Utils
             switch (config.ExportTo) {
                 case 0: CSV.GetCSV(head,path,result); break;
                 case 1: CSV.GetCSV(head,path,result); if (EndProgram) { Excel.GetExcel(path,Path2); } break;
+                case 2: JSON.GetJSON(path,result); break;
             }
         }
     }
