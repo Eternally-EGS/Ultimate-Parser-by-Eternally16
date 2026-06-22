@@ -8,7 +8,14 @@ namespace UltimateParser.Utils
         public static void GetSave (List<string> head,string path,List<Dictionary<string,string>> result,ParserConfig config,bool EndProgram,string Path2) {
             switch (config.ExportTo) {
                 case 0: CSV.GetCSV(head,path,result); break;
-                case 1: CSV.GetCSV(head,path,result); if (EndProgram) { Excel.GetExcel(path,Path2); } break;
+                case 1: CSV.GetCSV(head,path,result); 
+                if (EndProgram) { Excel.GetExcel(path,Path2); 
+                try {
+                    if(File.Exists(path)) { File.Delete(path);
+                    Logger.ConsoleOutput("Временный файл CSV удален!!",2); }
+                } catch { Logger.ConsoleOutput("Ошибка удоления временного файла CSV",2); } 
+                }
+                break;
                 case 2: JSON.GetJSON(path,result); break;
             }
         }

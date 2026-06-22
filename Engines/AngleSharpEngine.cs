@@ -110,8 +110,10 @@ namespace UltimateParser.Engines
 
                     row[localName] = Endvalue ?? "";
                 }
+            if (row.Count > 0 && row.Any(kvp => !string.IsNullOrWhiteSpace(kvp.Value))) {
+                results.Add(row);
+            }
 
-            results.Add(row);
             }
 
             await Task.Delay(2000);
