@@ -31,7 +31,7 @@ namespace UltimateParser.Engines
             // Create base page
             try {
                 Logger.ConsoleOutput($"Подключение... к: {url}",2);
-                document = await PageLoader.GetPageAsync(url,config.UserAgent);
+                document = await PageLoader.GetPageAsync(url,config.UserAgent,config);
             } 
             catch (Exception ex) {
             Logger.ConsoleOutput($"Ошибка подключния к: {config?.Url ?? ""} : {ex}",1);

@@ -22,6 +22,7 @@ namespace UltimateParser.Config {
         public int Pages {get; set;} = 0;
         public List<string> Proxies {get; set;} = new List<string>();
         public bool UseProxy {get; set;} = false;
+        public int TimeOut {get;set;}
         public string UserAgent {get; set;} = string.Empty;
     }
 
