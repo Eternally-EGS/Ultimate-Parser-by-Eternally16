@@ -55,7 +55,7 @@ namespace UltimateParser.Engines
             int itemCount = items?.Count() ?? 0;
             
             if (items == null || itemCount == 0) {
-                Logger.ConsoleOutput($"Элементы по MainSelector: {config?.MainSelector ?? ""} не найдены !!!",1);    
+                Logger.ConsoleOutput($"MainSelector: {config?.MainSelector ?? ""} не найден !!!",1);    
                 continue;
             } else {
                 Logger.ConsoleOutput($"На странице: {i} найдено: {itemCount} элементов !!!",2); 
