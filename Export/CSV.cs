@@ -6,7 +6,7 @@ namespace UltimateParser.Export
     public static class CSV {
 
         public static void GetCSV (List<string> head,string path,List<Dictionary<string,string>> result) {
-                    
+            
             using(var writer = new StreamWriter(path,false,Encoding.UTF8)){
                 writer.WriteLine(string.Join(";",head));
 
