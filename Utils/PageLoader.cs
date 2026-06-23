@@ -126,8 +126,27 @@ namespace UltimateParser.Utils
                 };
 
                 _context = await _browser.NewContextAsync(contextOptions);
-                _page = await _context.NewPageAsync();
+                _page = _context.Pages.FirstOrDefault() ?? await _context.NewPageAsync();
                 await _page.SetViewportSizeAsync(800, 600);
+
+                // Protaction
+
+                await _page.AddInitScriptAsync(@"() => {
+                    Object.defineProperty(navigator, 'webdriver', { get: () => undefined });
+
+                    Object.defineProperty(navigator, 'plugins', {
+                        get: () => [
+                            { name: 'Chrome PDF Viewer', filename: 'internal-pdf-viewer' },
+                            { name: 'Chromium PDF Viewer', filename: 'internal-pdf-viewer' }
+                        ]
+                    });
+
+                    Object.defineProperty(navigator, 'languages', { get: () => ['ru-RU', 'ru', 'en-US', 'en'] });
+
+                    Object.defineProperty(navigator, 'hardwareConcurrency', { get: () => 8 });
+                    Object.defineProperty(navigator, 'devicePixelRatio', { get: () => 1 });
+                }");
+
 
             if (!config.JS) {
                 await _page.RouteAsync("**/*.{png,jpg,jpeg,gif,webp,svg,css,woff,woff2,ttf}", async route => {
