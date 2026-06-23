@@ -152,6 +152,19 @@ namespace UltimateParser.Utils
 
             await _page.GotoAsync(url);
 
+            // Scroll
+            if (config.ScrollImitation) {
+                try {
+                await _page.EvaluateAsync("window.scrollTo(0, document.body.scrollHeight / 2);");
+                await Task.Delay(Random.Shared.Next(500, 1500)); 
+                await _page.EvaluateAsync("window.scrollTo(0, document.body.scrollHeight);");
+                await Task.Delay(Random.Shared.Next(500, 1000));
+                await _page.EvaluateAsync("window.scrollTo(0, 0);");
+                } catch {
+                    Logger.ConsoleOutput("[ScrollImitation] не удался!!",1);
+                }
+            }
+
             if (!string.IsNullOrEmpty(config.WaitForSelector)) {
                 await _page.WaitForSelectorAsync(config.WaitForSelector, new PageWaitForSelectorOptions {
                     Timeout = config.Timeout

@@ -44,6 +44,8 @@ namespace UltimateParser.Config {
         // Randomization tick
         public int MaxDelay {get; set;}
         public int MinDelay {get; set;}
+        // Scrol imitation
+        public bool ScrollImitation {get; set;}
 
     // Main Setting
 
