@@ -15,6 +15,9 @@ namespace UltimateParser.Config {
     // Main setting
     public class ParserConfig {
         public int ExportTo {get; set;}
+        public bool Headless {get; set;}
+        public string WaitForSelector {get; set;} = string.Empty;
+        public int Timeout {get; set;}
         public string Url {get; set;} = string.Empty;
         public List<FieldConfig> Fields {get; set;} = new List<FieldConfig>();
         public string MainSelector {get; set;} = string.Empty;
