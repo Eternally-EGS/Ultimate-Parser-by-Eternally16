@@ -21,7 +21,7 @@ static void SetupExit() {
     Console.CancelKeyPress += (sender,e) => {
         e.Cancel = true;
         isExit = true;
-        Logger.ConsoleOutput("Получен сигнал прерывания Выходим...",1);
+        
     };
 }
 
@@ -53,14 +53,14 @@ switch (config?.EngineType ?? 0) {
 engien.OnCheckpoint += (data) => SaveManager.GetSave(header,"Out.csv",data,config!,false,"");
 var result = await engien.GetParse(config!);
 
-Logger.ConsoleOutput($"Парсинг завершён найдено: {result.Count} элементов",2);
+
 
 // Protaction
 if (result.Count > 0) {
     SaveManager.GetSave(header,CsvPath,result,config!,true,ExcelPath);
 }
-Logger.ConsoleOutput("Лог файл ProgramLog.txt сохранен в директории проекта !",2);
-Logger.ConsoleOutput("Покеда !",2);
+
+
         }
     }
 }

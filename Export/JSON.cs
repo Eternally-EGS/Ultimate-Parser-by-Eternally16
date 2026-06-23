@@ -19,9 +19,9 @@ namespace UltimateParser.Export
             string cleanJson = Regex.Unescape(rawJson);
 
             File.WriteAllText(jsonpath,cleanJson,System.Text.Encoding.UTF8);
-            Logger.ConsoleOutput("Успешно созранено в JSON!!",2);
+            
             } catch {
-                Logger.ConsoleOutput("Ошибка сохранения в JSON",0);
+                
             }
         }
 

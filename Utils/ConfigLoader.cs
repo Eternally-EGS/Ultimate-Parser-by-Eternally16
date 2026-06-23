@@ -10,7 +10,7 @@ namespace UltimateParser.Utils
 
             if (!File.Exists(path)) 
             {
-                Logger.ConsoleOutput($"Файл {path} не найден!",0);
+                
             }
 
             string json = File.ReadAllText(path);

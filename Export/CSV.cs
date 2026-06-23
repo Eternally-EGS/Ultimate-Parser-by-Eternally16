@@ -15,7 +15,7 @@ namespace UltimateParser.Export
                     writer.WriteLine(string.Join(";",value.Select(v => $"\"{v}\"")));
                 }
             }
-            Logger.ConsoleOutput("Успешно сохранено в CSV !!!",2);
+            
         }
     }
 }

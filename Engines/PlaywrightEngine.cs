@@ -19,7 +19,7 @@ namespace UltimateParser.Engines
         
         var results = new List<Dictionary<string,string>>();
 
-            Logger.ConsoleOutput($"Движок Playwright успешно загружен!!",2);
+            
 
             for (var i = 1;i<= config?.Pages;i++) {
 
@@ -37,15 +37,15 @@ namespace UltimateParser.Engines
             // Create base page
 
             try {
-                Logger.ConsoleOutput($"Подключение... к: {url}",2);
+                
                 document = await PageLoader.GetPagePlaywrightAsync(url,config);
             } 
             catch (Exception ex) {
-            Logger.ConsoleOutput($"Ошибка подключния к: {config?.Url ?? ""} : {ex}",1);
+            
             continue;
             }
 
-            Logger.ConsoleOutput($"Страница: {i} загружена !!!",2); 
+             
 
             IEnumerable<IElement> items;
 
@@ -62,10 +62,10 @@ namespace UltimateParser.Engines
             int itemCount = items?.Count() ?? 0;
             
             if (items == null || itemCount == 0) {
-                Logger.ConsoleOutput($"MainSelector: {config?.MainSelector ?? ""} не найден !!!",1);    
+                    
                 continue;
             } else {
-                Logger.ConsoleOutput($"На странице: {i} найдено: {itemCount} элементов !!!",2); 
+                 
             }
 
             // Main parsing 
@@ -94,7 +94,7 @@ namespace UltimateParser.Engines
                     }
 
                     if (element == null) { 
-                    Logger.ConsoleOutput($"Элемент: {field0?.Name ?? ""} не найден ",1);    
+                        
                     continue; }
 
                     string value;
@@ -103,7 +103,7 @@ namespace UltimateParser.Engines
                         value = element?.GetAttribute(localAttribute) ?? "";
                         
                         if (string.IsNullOrEmpty(value)){
-                            Logger.ConsoleOutput($"Элемент: {localName} Не найден атребут: {localAttribute}",1);
+                            
                             row[localName] = "";
                             continue;
                         }

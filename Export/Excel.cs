@@ -13,7 +13,7 @@ namespace UltimateParser.Export
         public static void GetExcel (string path, string pathXL) {
 
             if (!File.Exists(path)) { 
-                Logger.ConsoleOutput($"CSV файл не найден для конвертации!", 0); 
+                 
                 return; 
             }
 
@@ -63,10 +63,10 @@ namespace UltimateParser.Export
                     works.Columns().AdjustToContents();
                     workbook.SaveAs(pathXL);
                 }
-                Logger.ConsoleOutput("Excel успешно создан из CSV файла!", 2);
+                
             }
             catch (Exception ex) {
-                Logger.ConsoleOutput($"Ошибка ClosedXML: {ex.Message}", 0);
+                
             }
         }
     }

@@ -30,7 +30,7 @@ namespace UltimateParser.Utils
             int index = Interlocked.Increment(ref currentIndex) % _proxies.Length;
             string currentProxy = _proxies[Math.Abs(index)];
 
-            Logger.ConsoleOutput($"[PROXY] Запрос через: {currentProxy}", 2);
+            
 
             if (InnerHandler is HttpClientHandler clientHandler) {
                 if (Uri.TryCreate(currentProxy, UriKind.Absolute, out var uri)) {
@@ -113,7 +113,7 @@ namespace UltimateParser.Utils
                         } else {
                             launchOptions.Proxy = new Proxy { Server = activeProxy };
                         }
-                        Logger.ConsoleOutput($"[Playwright] Браузер запускается через прокси: {activeProxy}", 2);
+                        
                     }
                 }
 
@@ -180,7 +180,7 @@ namespace UltimateParser.Utils
                 await Task.Delay(Random.Shared.Next(500, 1000));
                 await _page.EvaluateAsync("window.scrollTo(0, 0);");
                 } catch {
-                    Logger.ConsoleOutput("[ScrollImitation] не удался!!",1);
+                    
                 }
             }
 

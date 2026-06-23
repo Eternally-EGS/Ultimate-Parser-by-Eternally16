@@ -12,8 +12,8 @@ namespace UltimateParser.Utils
                 if (EndProgram) { Excel.GetExcel(path,Path2); 
                 try {
                     if(File.Exists(path)) { File.Delete(path);
-                    Logger.ConsoleOutput("Временный файл CSV удален!!",2); }
-                } catch { Logger.ConsoleOutput("Ошибка удоления временного файла CSV",2); } 
+                     }
+                } catch {  } 
                 }
                 break;
                 case 2: JSON.GetJSON(path,result); break;
