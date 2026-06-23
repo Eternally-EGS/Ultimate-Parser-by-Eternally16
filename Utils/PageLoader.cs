@@ -129,14 +129,25 @@ namespace UltimateParser.Utils
                 _page = await _context.NewPageAsync();
                 await _page.SetViewportSizeAsync(800, 600);
 
+            if (!config.JS) {
                 await _page.RouteAsync("**/*.{png,jpg,jpeg,gif,webp,svg,css,woff,woff2,ttf}", async route => {
-                    var type = route.Request.ResourceType;
-                    if (type == "image" || type == "font" || type == "stylesheet") {
-                        await route.AbortAsync();
-                    } else {
-                        await route.ContinueAsync();
-                    }
-                });
+                        var type = route.Request.ResourceType;
+                        if (type == "image" || type == "font" || type == "stylesheet") {
+                            await route.AbortAsync();
+                        } else {
+                            await route.ContinueAsync();
+                        }
+                    });
+            }
+            }
+
+            // Randomization tick
+            int Min = config.MinDelay;
+            int Max = config.MaxDelay;
+
+            if(Min> 0 && Max > Min){ 
+                int delay = Random.Shared.Next(Min,Max);
+                await Task.Delay(delay);
             }
 
             await _page.GotoAsync(url);

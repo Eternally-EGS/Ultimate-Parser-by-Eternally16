@@ -39,6 +39,11 @@ namespace UltimateParser.Config {
         public string WaitForSelector {get; set;} = string.Empty;
         // Timeout (milisecunde)
         public int Timeout {get; set;}
+        // Enable JS 
+        public bool JS {get; set;}
+        // Randomization tick
+        public int MaxDelay {get; set;}
+        public int MinDelay {get; set;}
 
     // Main Setting
 
