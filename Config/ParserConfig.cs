@@ -15,6 +15,7 @@ namespace UltimateParser.Config {
     // Main setting
     public class ParserConfig {
         public int ExportTo {get; set;}
+        public int EngineType {get; set;}
         public bool Headless {get; set;}
         public string WaitForSelector {get; set;} = string.Empty;
         public int Timeout {get; set;}
