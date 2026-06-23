@@ -1,10 +1,4 @@
-using System;
-using System.IO;
-using System.Linq;
 using System.Net;
-using System.Net.Http;
-using System.Threading;
-using System.Threading.Tasks;
 using AngleSharp;
 using AngleSharp.Dom;
 using AngleSharp.Io;
@@ -33,7 +27,7 @@ namespace UltimateParser.Utils
             
 
             if (InnerHandler is HttpClientHandler clientHandler) {
-                if (Uri.TryCreate(currentProxy, UriKind.Absolute, out var uri)) {
+                if (!string.IsNullOrEmpty(currentProxy) && Uri.TryCreate(currentProxy, UriKind.Absolute, out var uri)) {
                     var webProxy = new WebProxy($"{uri.Scheme}://{uri.Host}:{uri.Port}");
                     
                     if (!string.IsNullOrEmpty(uri.UserInfo)) {
@@ -63,7 +57,7 @@ namespace UltimateParser.Utils
             if (httpclient != null) return;
 
             lock (_Lock) {
-                if (config.UseProxy && config.Proxies != null && config.Proxies.Count > 0) {
+                if (config != null && config.UseProxy && config.Proxies != null && config.Proxies.Count > 0) {
                     var activeproxy = config.Proxies.Where(p => !string.IsNullOrWhiteSpace(p)).ToArray();
 
                     if (activeproxy.Length > 0) {
@@ -76,7 +70,9 @@ namespace UltimateParser.Utils
                     httpclient = new HttpClient();
                 }
 
-                httpclient.Timeout = TimeSpan.FromSeconds(config.TimeOut);
+                if (config != null) {
+                    httpclient.Timeout = TimeSpan.FromSeconds(config.TimeOut);
+                }
             }
         }
 
@@ -87,15 +83,17 @@ namespace UltimateParser.Utils
             req.Headers["User-Agent"] = UserAgent ?? "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36";
 
             var configstr = Configuration.Default
-                .WithRequester(new HttpClientRequester(httpclient))
+                .WithRequester(new HttpClientRequester(httpclient ?? new HttpClient()))
                 .WithDefaultLoader()
                 .WithCookies();
 
             var context = BrowsingContext.New(configstr);
-            return await context.OpenAsync(url);
+            return await context.OpenAsync(url ?? "");
         }
 
         public static async Task<IDocument> GetPagePlaywrightAsync(string url, ParserConfig config) {
+            if (config == null) config = new ParserConfig();
+
             if (_page == null) {
                 _playwright = await Playwright.CreateAsync();
 
@@ -164,12 +162,12 @@ namespace UltimateParser.Utils
             int Min = config.MinDelay;
             int Max = config.MaxDelay;
 
-            if(Min> 0 && Max > Min){ 
+            if(Min > 0 && Max > Min){ 
                 int delay = Random.Shared.Next(Min,Max);
                 await Task.Delay(delay);
             }
 
-            await _page.GotoAsync(url);
+            await _page.GotoAsync(url ?? "");
 
             // Scroll
             if (config.ScrollImitation) {
@@ -186,7 +184,7 @@ namespace UltimateParser.Utils
 
             if (!string.IsNullOrEmpty(config.WaitForSelector)) {
                 await _page.WaitForSelectorAsync(config.WaitForSelector, new PageWaitForSelectorOptions {
-                    Timeout = config.Timeout
+                    Timeout = (float)config.Timeout
                 });
             }
 
@@ -195,7 +193,7 @@ namespace UltimateParser.Utils
             var angleConfig = Configuration.Default.WithDefaultLoader();
             var angleContext = BrowsingContext.New(angleConfig);
             
-            return await angleContext.OpenAsync(reg => reg.Content(html));
+            return await angleContext.OpenAsync(reg => reg.Content(html ?? ""));
         }
     }
 }

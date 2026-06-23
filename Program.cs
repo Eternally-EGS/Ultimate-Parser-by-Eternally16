@@ -1,66 +1,90 @@
-﻿using AngleSharp;
-using AngleSharp.Io;
-using AngleSharp.Dom;
-using System.IO;
-using System.Text;
-using AngleSharp.Io.Network;
-using UltimateParser.Config;
+﻿using UltimateParser.Config;
 using UltimateParser.Utils;
 using UltimateParser.Engines;
-using UltimateParser.Export;
 
-namespace UltimateParser {
-
-class UltimateParser_Main 
+namespace UltimateParser 
 {
+    class UltimateParser_Main 
+    {
+        // Savty exit
+        public static bool isExit = false;
 
-// Savty exit
-public static bool isExit = false;
+        static void SetupExit() {
+            Console.CancelKeyPress += (sender, e) => {
+                e.Cancel = true;
+                isExit = true;
+                Logger.Log("Program_Quiting");
+            };
+        }
 
-static void SetupExit() {
-    Console.CancelKeyPress += (sender,e) => {
-        e.Cancel = true;
-        isExit = true;
-        
-    };
-}
+        static async Task Main(string[] args) {
+            SetupExit();
+            
+            Logger.Divider();
+            Logger.Log("Parser_Init");
 
-static async Task Main(string[] args)  {
+            string projectPath = AppDomain.CurrentDomain.BaseDirectory;
+            try {
+                var parent = Directory.GetParent(projectPath)?.Parent?.Parent?.Parent;
+                if (parent != null) {
+                    projectPath = parent.FullName;
+                }
+            }
+            catch {
+            }
 
-SetupExit();
+            string jsonPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Config.json");
+            
+            if (!File.Exists(jsonPath) && projectPath != AppDomain.CurrentDomain.BaseDirectory) {
+                jsonPath = Path.Combine(projectPath, "Config.json");
+            }
 
-string projectPath = Directory.GetParent(AppDomain.CurrentDomain.BaseDirectory)!.Parent!.Parent!.Parent!.FullName;
-string JsonPath = "Config.json";
-string CsvPath = Path.Combine(projectPath,"Out.csv");
-string ExcelPath = Path.Combine(projectPath,"Out.xlsx");
+            string csvPath = Path.Combine(projectPath, "Out.csv");
+            string excelPath = Path.Combine(projectPath, "Out.xlsx");
 
-ParserConfig config = ConfigLoader.GetConfig(JsonPath);
+            ParserConfig config = ConfigLoader.GetConfig(jsonPath);
+            bool isValid = Validator.GetValidator(config);
+            if (!isValid) return;
 
-bool isValid = Validator.GetValidator(config);
-if (!isValid) return;
+            var header = config.Fields?.Select(el => el.Name).ToList() ?? new List<string>();
 
+            IParserEngine engine;
+            switch (config.EngineType) {
+                case 0: 
+                    engine = new AngelSharpEngine();  
+                    Logger.Log("Engine_AngleSharp");
+                    break;
+                case 1: 
+                    engine = new PlaywrightEngine();  
+                    Logger.Log("Engine_Playwright");
+                    break;
+                default: 
+                    engine = new AngelSharpEngine(); 
+                    Logger.Log("Engine_Unknown");
+                    break;
+            }
 
-var header = config?.Fields?.Select(el => el.Name).ToList() ?? new List<string>();
+            engine.OnCheckpoint += (data) => {
+                if (!isExit && data != null && data.Count > 0) {
+                    SaveManager.GetSave(header, csvPath, data, config, false, excelPath);
+                }
+            };
 
-IParserEngine engien;
+            Logger.Log("Parser_Start");
+            
+            var result = await engine.GetParse(config);
 
-switch (config?.EngineType ?? 0) {
-    case 0: engien = new AngelSharpEngine();  break;
-    case 1: engien = new PlaywrightEngine();  break;
-    default: engien = new AngelSharpEngine(); break;
-}
+            // Protaction
+            if (result != null && result.Count > 0) {
+                Logger.Log("Parser_Success");
+                SaveManager.GetSave(header, csvPath, result, config, true, excelPath);
+            } 
+            else {
+                Logger.Log("Parser_Empty");
+            }
 
-engien.OnCheckpoint += (data) => SaveManager.GetSave(header,"Out.csv",data,config!,false,"");
-var result = await engien.GetParse(config!);
-
-
-
-// Protaction
-if (result.Count > 0) {
-    SaveManager.GetSave(header,CsvPath,result,config!,true,ExcelPath);
-}
-
-
+            Logger.Log("Parser_Finished");
+            Logger.Divider();
         }
     }
 }

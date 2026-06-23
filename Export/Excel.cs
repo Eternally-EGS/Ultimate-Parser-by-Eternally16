@@ -1,10 +1,7 @@
-using System;
 using System.Data;
-using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
 using ClosedXML.Excel;
-using UltimateParser.Utils;
 
 namespace UltimateParser.Export 
 {
@@ -12,19 +9,25 @@ namespace UltimateParser.Export
 
         public static void GetExcel (string path, string pathXL) {
 
-            if (!File.Exists(path)) { 
+            string safePath = path ?? "";
+            string safePathXL = pathXL ?? "output.xlsx";
+
+            if (!File.Exists(safePath)) { 
                  
+                Logger.Log("File_Write_Error", "Исходный CSV файл не найден для конвертации.");
                 return; 
             }
 
-            var lines = File.ReadAllLines(path, Encoding.UTF8);
+            var lines = File.ReadAllLines(safePath, Encoding.UTF8);
             if (lines.Length <= 0) return;
 
             var table = new DataTable();
 
-            var header = lines[0].Split(';');
+            var header = (lines[0] ?? "").Split(';');
             foreach (var head in header) {
-                table.Columns.Add(head.Trim('"'));
+                if (head != null) {
+                    table.Columns.Add(head.Trim('"'));
+                }
             }
 
             var csvParser = new Regex(";(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)");
@@ -36,8 +39,8 @@ namespace UltimateParser.Export
                 var values = csvParser.Split(currentLine);
 
                 for (int j = 0; j < values.Length; j++) {
-                    string v = values[j].Trim();
-                    if (v.StartsWith("\"") && v.EndsWith("\"")) {
+                    string v = (values[j] ?? "").Trim();
+                    if (v.StartsWith("\"") && v.EndsWith("\"") && v.Length >= 2) {
                         v = v.Substring(1, v.Length - 2);
                     }
                     values[j] = v.Replace("\"\"", "\"");
@@ -61,12 +64,12 @@ namespace UltimateParser.Export
                     var works = workbook.Worksheets.Add("Data");
                     works.Cell(1, 1).InsertTable(table);
                     works.Columns().AdjustToContents();
-                    workbook.SaveAs(pathXL);
+                    workbook.SaveAs(safePathXL);
                 }
-                
+                Logger.Log("Data_Saved", table.Rows.Count, safePathXL);
             }
             catch (Exception ex) {
-                
+                Logger.Log("File_Write_Error", ex.Message);
             }
         }
     }

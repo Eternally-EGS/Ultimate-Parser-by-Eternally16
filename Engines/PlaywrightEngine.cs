@@ -1,12 +1,8 @@
-using Microsoft.Playwright;
 using UltimateParser.Config;
 using AngleSharp.Dom;
 using UltimateParser.Parsers;
 using UltimateParser.Utils;
-using HtmlAgilityPack;
-using ClosedXML.Excel;
 using AngleSharp.XPath;
-using AngleSharp;
 
 namespace UltimateParser.Engines 
 {
@@ -19,91 +15,105 @@ namespace UltimateParser.Engines
         
         var results = new List<Dictionary<string,string>>();
 
-            
+            if (config == null) return results;
 
-            for (var i = 1;i<= config?.Pages;i++) {
+            int totalPages = config.Pages;
+
+            for (var i = 1; i <= totalPages; i++) {
 
                 // save and exit
-                if (UltimateParser_Main.isExit) { break; }
+                if (UltimateParser_Main.isExit) { 
+                    Logger.Log("App_Cancel");
+                    break; 
+                }
                 
                 // Buffer
                 OnCheckpoint?.Invoke(results);
 
             // Pages select
 
-            string url = config.Url.Replace("{Page}",i.ToString());
+            string url = (config.Url ?? "").Replace("{Page}", i.ToString());
+            Logger.Log("Nav_Start", url);
+
             IDocument? document = null;
             
             // Create base page
 
             try {
-                
-                document = await PageLoader.GetPagePlaywrightAsync(url,config);
+                document = await PageLoader.GetPagePlaywrightAsync(url, config);
+                if (document != null)
+                {
+                    Logger.Log("Html_Received", document.Source?.Text?.Length ?? 0);
+                }
             } 
-            catch (Exception ex) {
-            
-            continue;
+            catch (Exception) {
+                Logger.Log("Err_Page_Skip", url, 1);
+                continue;
             }
-
-             
 
             IEnumerable<IElement> items;
 
             // Xpath suport
             
             if (config.MainSelectorType == "XPath") {
-                var nodes = document.DocumentElement.SelectNodes(config?.MainSelector ?? "");
-                items = nodes.OfType<IElement>().ToList();
+                var nodes = document?.DocumentElement?.SelectNodes(config.MainSelector ?? "");
+                items = nodes?.OfType<IElement>().ToList() ?? new List<IElement>();
             }
             else {
-                items = document.QuerySelectorAll(config?.MainSelector ?? "");
+                items = document?.QuerySelectorAll(config.MainSelector ?? "") ?? Enumerable.Empty<IElement>();
             }
             
-            int itemCount = items?.Count() ?? 0;
+            int itemCount = items.Count();
             
-            if (items == null || itemCount == 0) {
-                    
+            if (itemCount == 0) {
+                Logger.Log("Crit_Layout_Changed");
                 continue;
             } else {
-                 
+                Logger.Log("Container_Found", itemCount);
             }
 
+            int itemIndex = 0;
+
             // Main parsing 
-            foreach(var item in items!) {
+            foreach(var item in items) {
+                itemIndex++;
+                Logger.Log("Item_Parse_Start", itemIndex, itemIndex);
+
                 var row = new Dictionary<string,string>();
 
-                foreach(var field0 in config?.Fields ?? new List<FieldConfig>()) {
+                foreach(var field0 in config.Fields ?? new List<FieldConfig>()) {
+                    if (field0 == null) continue;
 
-                    string localName = field0.Name;
-                    string localSelector = field0.Selector;
-                    string localAttribute = field0?.Attribute ?? "";
+                    string localName = field0.Name ?? "";
+                    string localSelector = field0.Selector ?? "";
+                    string localAttribute = field0.Attribute ?? "";
                     
-                   IElement? element = null;
+                    IElement? element = null;
 
                     // Flag 5 Xpath  !!
-                    if (field0!.Flags.Contains(5)) {
+                    if (field0.Flags != null && field0.Flags.Contains(5)) {
                         if (!string.IsNullOrEmpty(localSelector)) {
 
                             if(!localSelector.StartsWith(".")) localSelector = "." + localSelector;
                             element = item.SelectSingleNode(localSelector) as IElement;
                         }
 
-
                     } else {
-                    element = string.IsNullOrEmpty(localSelector) ? item : item.QuerySelector(localSelector);
+                        element = string.IsNullOrEmpty(localSelector) ? item : item.QuerySelector(localSelector);
                     }
 
                     if (element == null) { 
-                        
-                    continue; }
+                        Logger.Log("Warn_No_Field", localName, localName);
+                        continue; 
+                    }
 
                     string value;
-                    // Attribute check
+                     // Attribute check
                     if(!string.IsNullOrEmpty(localAttribute)) {
-                        value = element?.GetAttribute(localAttribute) ?? "";
+                        value = element.GetAttribute(localAttribute) ?? "";
                         
                         if (string.IsNullOrEmpty(value)){
-                            
+                            Logger.Log("Warn_No_Field", localName, localAttribute);
                             row[localName] = "";
                             continue;
                         }
@@ -113,23 +123,21 @@ namespace UltimateParser.Engines
                     }
                     
                     // Flag system
-                    string Endvalue = FlagSystem.GetFlag(value,field0!,url);
+                    string endValue = FlagSystem.GetFlag(value, field0, url) ?? "";
 
-                    row[localName] = Endvalue ?? "";
+                    row[localName] = endValue;
                 }
-            if (row.Count > 0 && row.Any(kvp => !string.IsNullOrWhiteSpace(kvp.Value))) {
-                results.Add(row);
+                if (row.Count > 0 && row.Any(kvp => !string.IsNullOrWhiteSpace(kvp.Value))) {
+                    results.Add(row);
+                }
             }
 
-            }
+            Logger.Log("Page_Done", i, results.Count);
 
             await Task.Delay(2000);
             }
 
             return results;
         }
-
-        
-        
     }
 }

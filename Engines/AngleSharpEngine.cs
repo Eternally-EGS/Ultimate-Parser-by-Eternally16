@@ -2,8 +2,6 @@ using AngleSharp.Dom;
 using UltimateParser.Config;
 using UltimateParser.Parsers;
 using UltimateParser.Utils;
-using HtmlAgilityPack;
-using ClosedXML.Excel;
 using AngleSharp.XPath;
 
 namespace UltimateParser.Engines 
@@ -18,112 +16,127 @@ namespace UltimateParser.Engines
             // Main result
             var results = new List<Dictionary<string,string>>();
 
-            
+            if (config == null) return results;
 
-            for (var i = 1;i<= config?.Pages;i++) {
+            int totalPages = config.Pages;
+
+            for (var i = 1; i <= totalPages; i++) {
 
                 // save and exit
-                if (UltimateParser_Main.isExit) { break; }
+                if (UltimateParser_Main.isExit) { 
+                    Logger.Log("App_Cancel");
+                    break; 
+                }
                 
                 // Buffer
                 OnCheckpoint?.Invoke(results);
 
-            // Pages select
+                // Pages select
 
-            string url = config.Url.Replace("{Page}",i.ToString());
+                string url = (config.Url ?? "").Replace("{Page}", i.ToString());
 
-            IDocument? document = null;
-            
-            // Create base page
-            try {
+                Logger.Log("Nav_Start", url);
+
+                IDocument? document = null;
                 
-                document = await PageLoader.GetPageAsync(url,config.UserAgent,config);
-            } 
-            catch (Exception ex) {
-            
-            continue;
-            }
-
-             
-
-            IEnumerable<IElement> items;
-
-            // Xpath suport
-            
-            if (config.MainSelectorType == "XPath") {
-                var nodes = document.DocumentElement.SelectNodes(config?.MainSelector ?? "");
-                items = nodes.OfType<IElement>().ToList();
-            }
-            else {
-                items = document.QuerySelectorAll(config?.MainSelector ?? "");
-            }
-            
-            int itemCount = items?.Count() ?? 0;
-            
-            if (items == null || itemCount == 0) {
-                    
-                continue;
-            } else {
-                 
-            }
-
-            // Main parsing 
-            foreach(var item in items!) {
-                var row = new Dictionary<string,string>();
-
-                foreach(var field0 in config?.Fields ?? new List<FieldConfig>()) {
-
-                    string localName = field0.Name;
-                    string localSelector = field0.Selector;
-                    string localAttribute = field0?.Attribute ?? "";
-                    
-                   IElement? element = null;
-
-                    // Flag 5 Xpath  !!
-                    if (field0!.Flags.Contains(5)) {
-                        if (!string.IsNullOrEmpty(localSelector)) {
-
-                            if(!localSelector.StartsWith(".")) localSelector = "." + localSelector;
-                            element = item.SelectSingleNode(localSelector) as IElement;
-                        }
-
-
-                    } else {
-                    element = string.IsNullOrEmpty(localSelector) ? item : item.QuerySelector(localSelector);
+                // Create base page
+                try {
+                    document = await PageLoader.GetPageAsync(url, config.UserAgent ?? "", config);
+                    if (document != null)
+                    {
+                        Logger.Log("Html_Received", document.Source?.Text?.Length ?? 0);
                     }
-
-                    if (element == null) { 
-                        
-                    continue; }
-
-                    string value;
-                    
-                    // Attribute check
-                    if(!string.IsNullOrEmpty(localAttribute)) {
-                        value = element?.GetAttribute(localAttribute) ?? "";
-                        
-                        if (string.IsNullOrEmpty(value)){
-                            
-                            row[localName] = "";
-                            continue;
-                        }
-                    
-                    } else {
-                        value = element.TextContent.Trim();
-                    }
-                    
-                    // Flag system
-                    string Endvalue = FlagSystem.GetFlag(value,field0!,url);
-
-                    row[localName] = Endvalue ?? "";
+                } 
+                catch (Exception) {
+                    Logger.Log("Err_Page_Skip", url, 1);
+                    continue;
                 }
-            if (row.Count > 0 && row.Any(kvp => !string.IsNullOrWhiteSpace(kvp.Value))) {
-                results.Add(row);
-            }
 
-            }
+                IEnumerable<IElement> items;
 
-            await Task.Delay(2000);
+                // Xpath suport
+                
+                if (config.MainSelectorType == "XPath") {
+                    var nodes = document?.DocumentElement?.SelectNodes(config.MainSelector ?? "");
+                    items = nodes?.OfType<IElement>().ToList() ?? new List<IElement>();
+                }
+                else {
+                    items = document?.QuerySelectorAll(config.MainSelector ?? "") ?? Enumerable.Empty<IElement>();
+                }
+                
+                int itemCount = items.Count();
+                
+                if (itemCount == 0) {
+                    Logger.Log("Crit_Layout_Changed");
+                    continue;
+                } else {
+                    Logger.Log("Container_Found", itemCount);
+                }
+
+                int itemIndex = 0;
+
+                // Main parsing 
+                foreach(var item in items) {
+                    itemIndex++;
+                    Logger.Log("Item_Parse_Start", itemIndex, itemIndex);
+
+                    var row = new Dictionary<string,string>();
+
+                    foreach(var field0 in config.Fields ?? new List<FieldConfig>()) {
+                        if (field0 == null) continue;
+
+                        string localName = field0.Name ?? "";
+                        string localSelector = field0.Selector ?? "";
+                        string localAttribute = field0.Attribute ?? "";
+                        
+                        IElement? element = null;
+
+                        // Flag 5 Xpath  !!
+                        if (field0.Flags != null && field0.Flags.Contains(5)) {
+                            if (!string.IsNullOrEmpty(localSelector)) {
+
+                                if(!localSelector.StartsWith(".")) localSelector = "." + localSelector;
+                                element = item.SelectSingleNode(localSelector) as IElement;
+                            }
+
+                        } else {
+                            element = string.IsNullOrEmpty(localSelector) ? item : item.QuerySelector(localSelector);
+                        }
+
+                        if (element == null) { 
+                            Logger.Log("Warn_No_Field", localName, localName);
+                            continue; 
+                        }
+
+                        string value;
+                        
+                        // Attribute check
+                        if(!string.IsNullOrEmpty(localAttribute)) {
+                            value = element.GetAttribute(localAttribute) ?? "";
+                            
+                            if (string.IsNullOrEmpty(value)){
+                                Logger.Log("Warn_No_Field", localName, localAttribute);
+                                row[localName] = "";
+                                continue;
+                            }
+                        
+                        } else {
+                            value = element.TextContent.Trim();
+                        }
+                        
+                        // Flag system
+                        string endValue = FlagSystem.GetFlag(value, field0, url) ?? "";
+
+                        row[localName] = endValue;
+                    }
+                    if (row.Count > 0 && row.Any(kvp => !string.IsNullOrWhiteSpace(kvp.Value))) {
+                        results.Add(row);
+                    }
+                }
+
+                Logger.Log("Page_Done", i, results.Count);
+
+                await Task.Delay(2000);
             }
             return results;
         }
