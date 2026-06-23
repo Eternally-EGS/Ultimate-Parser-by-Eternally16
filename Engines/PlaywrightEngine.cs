@@ -10,7 +10,7 @@ using AngleSharp;
 
 namespace UltimateParser.Engines 
 {
-    public class PlaywrightEngine {
+    public class PlaywrightEngine : IParserEngine {
         // AutoSave
         public event Action<List<Dictionary<string,string>>>? OnCheckpoint = null;
 

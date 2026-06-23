@@ -42,7 +42,14 @@ if (!isValid) return;
 
 var header = config?.Fields?.Select(el => el.Name).ToList() ?? new List<string>();
 
-var engien = new AngelSharpEngine();
+IParserEngine engien;
+
+switch (config?.EngineType ?? 0) {
+    case 0: engien = new AngelSharpEngine();  break;
+    case 1: engien = new PlaywrightEngine();  break;
+    default: engien = new AngelSharpEngine(); break;
+}
+
 engien.OnCheckpoint += (data) => SaveManager.GetSave(header,"Out.csv",data,config!,false,"");
 var result = await engien.GetParse(config!);
 

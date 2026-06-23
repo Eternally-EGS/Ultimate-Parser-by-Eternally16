@@ -8,7 +8,7 @@ using AngleSharp.XPath;
 
 namespace UltimateParser.Engines 
 {
-    public class AngelSharpEngine {
+    public class AngelSharpEngine : IParserEngine {
         public event Action<List<Dictionary<string,string>>>? OnCheckpoint = null;
         public async Task<List<Dictionary<string,string>>> GetParse (ParserConfig config) {
             
