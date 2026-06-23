@@ -19,15 +19,6 @@ namespace UltimateParser.Engines
         
         var results = new List<Dictionary<string,string>>();
 
-            using var playwright = await Playwright.CreateAsync();
-            
-            await using var browser = await playwright.Chromium.LaunchAsync(new BrowserTypeLaunchOptions{
-                Headless = config.Headless 
-            });
-
-            var page = await browser.NewPageAsync();
-            await page.SetViewportSizeAsync(800,600);
-
             Logger.ConsoleOutput($"Движок Playwright успешно загружен!!",2);
 
             for (var i = 1;i<= config?.Pages;i++) {
@@ -41,25 +32,13 @@ namespace UltimateParser.Engines
             // Pages select
 
             string url = config.Url.Replace("{Page}",i.ToString());
-            await page.GotoAsync(url);
-
-            if (!string.IsNullOrEmpty(config.WaitForSelector)) {
-                await page.WaitForSelectorAsync(config.WaitForSelector,new PageWaitForSelectorOptions{
-                    Timeout = config.Timeout
-                });
-            }
-
             IDocument? document = null;
             
             // Create base page
-            var html = await page.ContentAsync();
-
-            var angleConfig = Configuration.Default.WithDefaultLoader();
-            var context = BrowsingContext.New(angleConfig);
 
             try {
                 Logger.ConsoleOutput($"Подключение... к: {url}",2);
-                document = await context.OpenAsync(reg => reg.Content(html));
+                document = await PageLoader.GetPagePlaywrightAsync(url,config);
             } 
             catch (Exception ex) {
             Logger.ConsoleOutput($"Ошибка подключния к: {config?.Url ?? ""} : {ex}",1);

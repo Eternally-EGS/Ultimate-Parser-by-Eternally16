@@ -14,7 +14,6 @@ namespace UltimateParser.Engines
             
             var results = new List<Dictionary<string,string>>();
 
-
             Logger.ConsoleOutput($"Движок AngleSharp успешно загружен!!",2);
 
             for (var i = 1;i<= config?.Pages;i++) {

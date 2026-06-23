@@ -17,6 +17,8 @@ namespace UltimateParser.Config {
         public int ExportTo {get; set;}
         public int EngineType {get; set;}
         public bool Headless {get; set;}
+        public string Locale {get; set;} = string.Empty;
+        public string TimezoneId {get; set;} = string.Empty;
         public string WaitForSelector {get; set;} = string.Empty;
         public int Timeout {get; set;}
         public string Url {get; set;} = string.Empty;
