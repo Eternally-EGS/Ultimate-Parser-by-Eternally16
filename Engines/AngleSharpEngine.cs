@@ -9,9 +9,13 @@ using AngleSharp.XPath;
 namespace UltimateParser.Engines 
 {
     public class AngelSharpEngine : IParserEngine {
+        // Autosave 
         public event Action<List<Dictionary<string,string>>>? OnCheckpoint = null;
+
+        // Engine
         public async Task<List<Dictionary<string,string>>> GetParse (ParserConfig config) {
             
+            // Main result
             var results = new List<Dictionary<string,string>>();
 
             Logger.ConsoleOutput($"Движок AngleSharp успешно загружен!!",2);
@@ -93,6 +97,7 @@ namespace UltimateParser.Engines
                     continue; }
 
                     string value;
+                    
                     // Attribute check
                     if(!string.IsNullOrEmpty(localAttribute)) {
                         value = element?.GetAttribute(localAttribute) ?? "";
