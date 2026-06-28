@@ -13,7 +13,7 @@ namespace UltimateParser.Parsers
 
                 // Full Link 1
                 if (field.Flags.Contains(1)){
-                    if (safeValue.StartsWith("/") && !string.IsNullOrEmpty(safeUrl))
+                    if (!string.IsNullOrEmpty(safeUrl))
                     {
                         try {
                             safeValue = new Uri(new Uri(safeUrl), safeValue).ToString();    
