@@ -134,7 +134,10 @@ namespace UltimateParser.Engines
 
             Logger.Log("Page_Done", i, results.Count);
 
-            await Task.Delay(2000);
+                           // Randomization tick
+                    int Min = config.MinDelay;
+                    int Max = config.MaxDelay;
+                await Task.Delay(Random.Shared.Next(Min, Max));
             }
 
             return results;
