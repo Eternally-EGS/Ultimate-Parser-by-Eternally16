@@ -38,8 +38,8 @@ namespace UltimateParser.Utils
             }
 
             string Parameter = DateTime.Now.ToString("dd_MM HH-mm");
-
             string safePath = Path.Combine(folderPath ?? ".", $"[{Parameter}] Out.csv");
+            string safePath_t = Path.Combine(folderPath ?? ".", $"TEMP_[{Parameter}] Out.csv");
             string safePath2 = Path.Combine(folderPath ?? ".", $"[{Parameter}] Out.xlsx");
             string safePath3 = Path.Combine(folderPath ?? ".", $"[{Parameter}] Out.json");
             var safeHead = head ?? new List<string>();
@@ -51,9 +51,24 @@ namespace UltimateParser.Utils
                     break;
 
                 case 1: 
-                    CSV.GetCSV(safeHead,safePath, safeResult); 
+                    CSV.GetCSV(safeHead, safePath_t, safeResult); 
+                    
                     if (EndProgram) {  
-                        Excel.GetExcel(safePath, safePath2); }
+                        try {
+                            Excel.GetExcel(safePath_t, safePath2); 
+                            
+                            if (File.Exists(safePath_t)) {
+                                File.Delete(safePath_t);
+                            }
+                        }
+                        catch (Exception ex) {
+                            Logger.Log($"Excel_Error: {ex.Message}. Saving fallback CSV...");
+                            
+                            if (File.Exists(safePath_t)) {
+                                File.Move(safePath_t, safePath);
+                            }
+                        }
+                    }
                     break;
                 case 2: 
                     JSON.GetJSON(safePath3, safeResult); 
