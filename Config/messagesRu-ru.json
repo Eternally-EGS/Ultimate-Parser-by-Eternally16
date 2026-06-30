@@ -66,6 +66,7 @@
   "Delay_Range_Error": { "Level": "ERROR", "Text": "Ошибка конфигурации: MinDelay не может быть больше MaxDelay." },
   "Proxy_Empty_Error": { "Level": "ERROR", "Text": "Ошибка конфигурации: Включен прокси, но список адресов пуст." },
   "File_Delete_Error": { "Level": "WARNING", "Text": "Не удалось удалить временный CSV файл после конвертации." },
-  "Program_Quiting": { "Level": "WARNING", "Text": "Программа завершает работу по желанию пользователя" }
+  "Program_Quiting": { "Level": "WARNING", "Text": "Программа завершает работу по желанию пользователя" },
+  "ScrollFailed": { "Level": "WARNING", "Text": "Автоматический скролинг не сработал" }
 
 }
