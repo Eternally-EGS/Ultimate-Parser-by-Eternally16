@@ -46,7 +46,7 @@
   "Crit_Layout_Changed": { "Level": "CRITICAL", "Text": "СТРУКТУРА САЙТА ИЗМЕНИЛАСЬ! Ключевые селекторы выдают null. Парсинг невозможен." },
   "Crit_Memory_Low": { "Level": "CRITICAL", "Text": "ВНИМАНИЕ: Память приложения переполнена! Принудительный сброс кэша." },
 
-  "Parser_Init": { "Level": "INIT", "Text": "=== Инициализация движка UltimateParser ===" },
+  "Parser_Init": { "Level": "INIT", "Text": "=== Инициализация движка UltimateParser V 0.2 ===" },
   "Engine_AngleSharp": { "Level": "INIT", "Text": "Активирован движок: AngleSharp (Статический HTML)" },
   "Engine_Playwright": { "Level": "INIT", "Text": "Активирован движок: Playwright (Эмуляция браузера)" },
   "Engine_Unknown": { "Level": "WARNING", "Text": "Неизвестный тип движка. По умолчанию выбран AngleSharp." },

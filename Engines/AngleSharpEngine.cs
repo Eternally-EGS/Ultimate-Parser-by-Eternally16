@@ -130,7 +130,7 @@ namespace UltimateParser.Engines
 
                         row[localName] = endValue;
                     }
-                       if(TableProcessing.TableCP(row)) { results.Add(row); };
+                       if(TableProcessing.TableCP(row,config)) { results.Add(row); };
                 }
 
                 Logger.Log("Page_Done", i, results.Count);
