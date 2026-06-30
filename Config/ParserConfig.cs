@@ -67,6 +67,8 @@ namespace UltimateParser.Config {
         public string UserAgent {get; set;} = string.Empty;
         // Export folder base (project/Exports)
         public string ExportFolderPath {get; set;} = string.Empty;
+        // Table cleanup
+        public bool PostProcessing { get; set; } = true;
     }
 
 }

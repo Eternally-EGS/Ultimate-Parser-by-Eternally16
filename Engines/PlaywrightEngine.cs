@@ -3,6 +3,7 @@ using AngleSharp.Dom;
 using UltimateParser.Parsers;
 using UltimateParser.Utils;
 using AngleSharp.XPath;
+using UltimateParser.Export;
 
 namespace UltimateParser.Engines 
 {
@@ -127,9 +128,7 @@ namespace UltimateParser.Engines
 
                     row[localName] = endValue;
                 }
-                if (row.Count > 0 && row.Any(kvp => !string.IsNullOrWhiteSpace(kvp.Value))) {
-                    results.Add(row);
-                }
+                    if(TableProcessing.TableCP(row)) { results.Add(row); };
             }
 
             Logger.Log("Page_Done", i, results.Count);
