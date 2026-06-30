@@ -8,7 +8,7 @@ namespace UltimateParser.Export
         
         public static void GetJSON (string path,List<Dictionary<string,string>> result){
             try {
-                string safePath = path ?? "output";
+                string safePath = path ?? "Out.json";
                 var safeResult = result ?? new List<Dictionary<string, string>>();
                 string jsonpath = Path.ChangeExtension(safePath, ".json") ?? "output.json";
 

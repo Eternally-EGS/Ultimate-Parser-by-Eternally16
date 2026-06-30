@@ -9,7 +9,7 @@ namespace UltimateParser.Export
             try {
                 var safeHead = head ?? new List<string>();
                 var safeResult = result ?? new List<Dictionary<string,string>>();
-                var safePath = path ?? "output.csv";
+                var safePath = path ?? "Out.csv";
 
                 using(var writer = new StreamWriter(safePath,false,Encoding.UTF8)){
                     writer.WriteLine(string.Join(";",safeHead));

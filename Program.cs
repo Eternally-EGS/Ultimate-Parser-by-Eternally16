@@ -66,7 +66,7 @@ namespace UltimateParser
 
             engine.OnCheckpoint += (data) => {
                 if (!isExit && data != null && data.Count > 0) {
-                    SaveManager.GetSave(header, csvPath, data, config, false, excelPath);
+                    SaveManager.GetSaving(header, data, config, false);
                 }
             };
 
@@ -77,7 +77,7 @@ namespace UltimateParser
             // Protaction
             if (result != null && result.Count > 0) {
                 Logger.Log("Parser_Success");
-                SaveManager.GetSave(header, csvPath, result, config, true, excelPath);
+                SaveManager.GetSaving(header, result, config, true);
             } 
             else {
                 Logger.Log("Parser_Empty");

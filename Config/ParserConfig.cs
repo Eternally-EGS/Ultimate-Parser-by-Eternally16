@@ -65,6 +65,8 @@ namespace UltimateParser.Config {
         public int Pages {get; set;} = 0;
         // Browser Name
         public string UserAgent {get; set;} = string.Empty;
+        // Export folder base (project/Exports)
+        public string ExportFolderPath {get; set;} = string.Empty;
     }
 
 }

@@ -10,7 +10,7 @@ namespace UltimateParser.Export
         public static void GetExcel (string path, string pathXL) {
 
             string safePath = path ?? "";
-            string safePathXL = pathXL ?? "output.xlsx";
+            string safePathXL = pathXL ?? "Out.xlsx";
 
             if (!File.Exists(safePath)) { 
                  
