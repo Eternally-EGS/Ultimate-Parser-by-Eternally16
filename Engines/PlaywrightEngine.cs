@@ -5,141 +5,89 @@ using UltimateParser.Utils;
 using AngleSharp.XPath;
 using UltimateParser.Export;
 
-namespace UltimateParser.Engines 
+namespace UltimateParser.Engines
 {
-    public class PlaywrightEngine : IParserEngine {
-        // AutoSave
-        public event Action<List<Dictionary<string,string>>>? OnCheckpoint = null;
+    public class PlaywrightEngine : IParserEngine
+    {
+        public event Action<List<Dictionary<string, string>>>? OnCheckpoint = null;
 
-        // Engine 
-        public async Task<List<Dictionary<string,string>>> GetParse (ParserConfig config) {
-        
-        var results = new List<Dictionary<string,string>>();
-
+        public async Task<List<Dictionary<string, string>>> GetParse(ParserConfig config)
+        {
+            var results = new List<Dictionary<string, string>>();
             if (config == null) return results;
 
-            int totalPages = config.Pages;
+            for (var i = 1; i <= config.Pages; i++)
+            {
+                if (UltimateParser_Main.isExit) break;
 
-            for (var i = 1; i <= totalPages; i++) {
+                string url = (config.Url ?? "").Replace("{Page}", i.ToString());
+                Logger.Log("Nav_Start", url);
 
-                // save and exit
-                if (UltimateParser_Main.isExit) { 
-                    Logger.Log("App_Cancel");
-                    break; 
-                }
+                IDocument? document = await LoadPageAsync(url, config);
+                if (document == null) continue;
 
-            // Pages select
-
-            string url = (config.Url ?? "").Replace("{Page}", i.ToString());
-            Logger.Log("Nav_Start", url);
-
-            IDocument? document = null;
-            
-            // Create base page
-
-            try {
-                document = await PageLoader.GetPagePlaywrightAsync(url, config);
-                if (document != null)
+                var items = GetItems(document, config);
+                if (!items.Any())
                 {
-                    Logger.Log("Html_Received", document.Source?.Text?.Length ?? 0);
+                    Logger.Log("Crit_Layout_Changed");
+                    continue;
                 }
-            } 
-            catch (Exception) {
-                Logger.Log("Err_Page_Skip", url, 1);
-                continue;
-            }
 
-            IEnumerable<IElement> items;
+                Logger.Log("Container_Found", items.Count());
 
-            // Xpath suport
-            
-            if (config.MainSelectorType == "XPath") {
-                var nodes = document?.DocumentElement?.SelectNodes(config.MainSelector ?? "");
-                items = nodes?.OfType<IElement>().ToList() ?? new List<IElement>();
-            }
-            else {
-                items = document?.QuerySelectorAll(config.MainSelector ?? "") ?? Enumerable.Empty<IElement>();
-            }
-            
-            int itemCount = items.Count();
-            
-            if (itemCount == 0) {
-                Logger.Log("Crit_Layout_Changed");
-                continue;
-            } else {
-                Logger.Log("Container_Found", itemCount);
-            }
-
-            int itemIndex = 0;
-
-            // Main parsing 
-            foreach(var item in items) {
-                itemIndex++;
-                Logger.Log("Item_Parse_Start", itemIndex, itemIndex);
-
-                var row = new Dictionary<string,string>();
-
-                foreach(var field0 in config.Fields ?? new List<FieldConfig>()) {
-                    if (field0 == null) continue;
-
-                    string localName = field0.Name ?? "";
-                    string localSelector = field0.Selector ?? "";
-                    string localAttribute = field0.Attribute ?? "";
-                    
-                    IElement? element = null;
-
-                    // Flag 5 Xpath  !!
-                    if (field0.Flags != null && field0.Flags.Contains(5)) {
-                        if (!string.IsNullOrEmpty(localSelector)) {
-
-                            if(!localSelector.StartsWith(".")) localSelector = "." + localSelector;
-                            element = item.SelectSingleNode(localSelector) as IElement;
-                        }
-
-                    } else {
-                        element = string.IsNullOrEmpty(localSelector) ? item : item.QuerySelector(localSelector);
-                    }
-
-                    if (element == null) { 
-                        Logger.Log("Warn_No_Field", localName, localName);
-                        continue; 
-                    }
-
-                    string value;
-                     // Attribute check
-                    if(!string.IsNullOrEmpty(localAttribute)) {
-                        value = element.GetAttribute(localAttribute) ?? "";
-                        
-                        if (string.IsNullOrEmpty(value)){
-                            Logger.Log("Warn_No_Field", localName, localAttribute);
-                            row[localName] = "";
-                            continue;
-                        }
-                    
-                    } else {
-                        value = element.TextContent.Trim();
-                    }
-                    
-                    // Flag system
-                    string endValue = FlagSystem.GetFlag(value, field0, url) ?? "";
-
-                    row[localName] = endValue;
+                foreach (var item in items)
+                {
+                    var row = ParseSingleItem(item, config, url);
+                    if (TableProcessing.TableCP(row, config)) { results.Add(row); }
                 }
-                    if(TableProcessing.TableCP(row,config)) { results.Add(row); };
+
+                Logger.Log("Page_Done", i, results.Count);
+                OnCheckpoint?.Invoke(results);
+                await Task.Delay(Random.Shared.Next(config.MinDelay, config.MaxDelay));
             }
-
-            Logger.Log("Page_Done", i, results.Count);
-
-            // Buffer
-            OnCheckpoint?.Invoke(results);
-
-            // Randomization tick
-                    int Min = config.MinDelay;
-                    int Max = config.MaxDelay;
-                await Task.Delay(Random.Shared.Next(Min, Max));
-            }
-
             return results;
+        }
+
+        private async Task<IDocument?> LoadPageAsync(string url, ParserConfig config)
+        {
+            try
+            {
+                var doc = await PageLoader.GetPagePlaywrightAsync(url, config);
+                if (doc != null) Logger.Log("Html_Received", doc.Source?.Text?.Length ?? 0);
+                return doc;
+            }
+            catch { Logger.Log("Err_Page_Skip", url, 1); return null; }
+        }
+
+        private IEnumerable<IElement> GetItems(IDocument document, ParserConfig config)
+        {
+            if (config.MainSelectorType == "XPath")
+            {
+                return document.DocumentElement?.SelectNodes(config.MainSelector ?? "")?.OfType<IElement>() ?? Enumerable.Empty<IElement>();
+            }
+            return document.QuerySelectorAll(config.MainSelector ?? "") ?? Enumerable.Empty<IElement>();
+        }
+
+        private Dictionary<string, string> ParseSingleItem(IElement item, ParserConfig config, string url)
+        {
+            var row = new Dictionary<string, string>();
+            foreach (var field in config.Fields ?? new List<FieldConfig>())
+            {
+                if (field == null) continue;
+                
+                IElement? element = (field.Flags != null && field.Flags.Contains(5)) 
+                    ? item.SelectSingleNode(field.Selector?.StartsWith(".") == true ? field.Selector : "." + field.Selector) as IElement
+                    : (string.IsNullOrEmpty(field.Selector) ? item : item.QuerySelector(field.Selector));
+
+                if (element == null) { Logger.Log("Warn_No_Field", field.Name ?? "", ""); continue; }
+
+                string value = !string.IsNullOrEmpty(field.Attribute) 
+                    ? element.GetAttribute(field.Attribute) ?? "" 
+                    : element.TextContent.Trim();
+
+                row[field.Name ?? ""] = FlagSystem.GetFlag(value, field, url) ?? "";
+            }
+            return row;
         }
     }
 }
