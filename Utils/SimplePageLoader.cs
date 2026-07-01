@@ -53,7 +53,15 @@ namespace UltimateParser.Utils
                 _context = await _browser.NewContextAsync(contextOptions);
                 _page = await _context.NewPageAsync();
 
-                // Скрытие автоматизации
+            if (!config.JS) 
+            {
+                await _page.RouteAsync("**/*.{png,jpg,jpeg,gif,webp,svg,css,woff,woff2,ttf}", async route => {
+                    var type = route.Request.ResourceType;
+                    if (type == "image" || type == "font" || type == "stylesheet") await route.AbortAsync();
+                    else await route.ContinueAsync();
+                });
+            }
+
                 await _page.AddInitScriptAsync(@"() => { Object.defineProperty(navigator, 'webdriver', { get: () => undefined }); }");
             }
             finally { _lock.Release(); }
@@ -65,6 +73,13 @@ namespace UltimateParser.Utils
             await _page.GotoAsync(url);
         }
 
+        public static async Task ImageCleanup () {
+            await _page.EvaluateAsync(@"() => {
+            document.querySelectorAll('img').forEach(img => img.remove());
+            document.querySelectorAll('.ads-block, .banner').forEach(el => el.remove());
+        }");
+        }
+
         public static async Task<string> GetHtmlAsync() 
         {
             return await _page!.ContentAsync();
@@ -73,7 +88,7 @@ namespace UltimateParser.Utils
         public static async Task ScrollDownAsync(ParserConfig config) 
         {
             if (_page == null) return;
-            await _page.EvaluateAsync($"window.scrollBy(0, {config.ImitationStepsCount})");
+            await _page.EvaluateAsync($"window.scrollBy(0, {Random.Shared.Next(config.ImitationStepsCount/2, config.ImitationStepsCount)})");
         }
 
         public static async Task CloseAsync()

@@ -73,6 +73,7 @@ namespace UltimateParser.Engines
                     Logger.Log("List_Done", results.Count);
                     OnCheckpoint?.Invoke(results);
                     await SimplePageLoader.ScrollDownAsync(config);
+                    await SimplePageLoader.ImageCleanup();
                     await Task.Delay(Random.Shared.Next(config.MinDelay, config.MaxDelay));
                 }
             }
