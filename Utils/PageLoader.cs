@@ -23,6 +23,35 @@ namespace UltimateParser.Utils
 
         private const int MaxAttempts = 3; 
 
+        public static async Task DisposePlaywrightAsync()
+        {
+            try
+            {
+                Logger.Log("Disposing Playwright resources...");
+                
+                // Сначала жестко закрываем сам браузер, если он открыт
+                if (_browser != null)
+                {
+                    await _browser.CloseAsync();
+                    await _browser.DisposeAsync();
+                    _browser = null;
+                }
+
+                // Затем тушим сам движок Playwright
+                if (_playwright != null)
+                {
+                    _playwright.Dispose();
+                    _playwright = null;
+                }
+
+                Logger.Log("Playwright disposed successfully.");
+            }
+            catch (Exception ex)
+            {
+                Logger.Log($"Error during Playwright dispose: {ex.Message}");
+            }
+        }
+
         private static void InitHttpClient(ParserConfig config) 
         {
             if (_httpClient != null) return;

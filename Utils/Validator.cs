@@ -43,12 +43,16 @@ namespace UltimateParser.Utils
                     return false;
                 }
             }
+            
+            /*
 
             // Pages
             if (config.Pages < 1) {
                 Logger.Log("Pages_Count_Error");
                 return false;
             }
+            
+            */
 
             // ExportTo
             if (config.ExportTo < 0 || config.ExportTo > 2) {
