@@ -29,9 +29,6 @@ namespace UltimateParser.Engines
                     break; 
                 }
                 
-                // Buffer
-                OnCheckpoint?.Invoke(results);
-
                 // Pages select
 
                 string url = (config.Url ?? "").Replace("{Page}", i.ToString());
@@ -42,7 +39,7 @@ namespace UltimateParser.Engines
                 
                 // Create base page
                 try {
-                    document = await PageLoader.GetPageAsync(url, config.UserAgent ?? "", config);
+                    document = await PageLoader.GetPageAsync(url, config);
                     if (document != null)
                     {
                         Logger.Log("Html_Received", document.Source?.Text?.Length ?? 0);
@@ -134,6 +131,9 @@ namespace UltimateParser.Engines
                 }
 
                 Logger.Log("Page_Done", i, results.Count);
+                
+                // Buffer
+                OnCheckpoint?.Invoke(results);
 
                 // Randomization tick
                     int Min = config.MinDelay;

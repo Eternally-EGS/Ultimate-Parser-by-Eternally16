@@ -27,9 +27,6 @@ namespace UltimateParser.Engines
                     Logger.Log("App_Cancel");
                     break; 
                 }
-                
-                // Buffer
-                OnCheckpoint?.Invoke(results);
 
             // Pages select
 
@@ -133,7 +130,10 @@ namespace UltimateParser.Engines
 
             Logger.Log("Page_Done", i, results.Count);
 
-                           // Randomization tick
+            // Buffer
+            OnCheckpoint?.Invoke(results);
+
+            // Randomization tick
                     int Min = config.MinDelay;
                     int Max = config.MaxDelay;
                 await Task.Delay(Random.Shared.Next(Min, Max));
