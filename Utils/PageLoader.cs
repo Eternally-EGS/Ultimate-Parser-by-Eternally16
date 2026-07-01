@@ -145,7 +145,8 @@ namespace UltimateParser.Utils
                                 "--disable-extensions",
                                 "--js-flags=\"--max-old-space-size=256\"",
                                 "--disable-background-networking",
-                                "--disable-background-timer-throttling"
+                                "--disable-background-timer-throttling",
+                                "--disable-blink-features=AutomationControlled"
                             }
                         };
                         
@@ -250,11 +251,11 @@ namespace UltimateParser.Utils
                 }
                 finally
                 {
-                   /// if (page != null) { try { await page.CloseAsync(); } catch { } }
-                  //  if (context != null) { try { await context.CloseAsync(); } catch { } }
+                    if (page != null) { try { await page.CloseAsync(); } catch { } }
+                    if (context != null) { try { await context.CloseAsync(); } catch { } }
                     
-                  //  GC.Collect();
-                   // GC.WaitForPendingFinalizers();
+                    GC.Collect();
+                    GC.WaitForPendingFinalizers();
                 }
 
                 // save and exit

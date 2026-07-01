@@ -73,6 +73,7 @@ namespace UltimateParser.Config {
         public float SelectorTimeout { get; set; } = 15000f; 
         public bool MoveMouseImitation {get; set;}
         public int ImitationStepsCount {get; set;} = 10;
+        public string PriorityField {get; set;} = string.Empty;
     }
 
 }

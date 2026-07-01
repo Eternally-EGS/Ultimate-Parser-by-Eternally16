@@ -12,6 +12,17 @@ namespace UltimateParser.Export
             // base
             if (_row == null) return false;
 
+            if (!string.IsNullOrEmpty(config.PriorityField)) {
+
+            // Priorety
+            string _PriorityField = config.PriorityField;
+
+            if (!_row.ContainsKey(_PriorityField) || string.IsNullOrWhiteSpace(_row[_PriorityField])) {
+            return false;
+            }
+
+            }
+
             // Pass
             bool hasAnyData = _row.Values.Any(v => !string.IsNullOrWhiteSpace(v));
             if (!hasAnyData) return false;
