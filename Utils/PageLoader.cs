@@ -136,6 +136,7 @@ namespace UltimateParser.Utils
 
             for (int attempt = 1; attempt <= MaxAttempts; attempt++)
             {
+
                 IBrowserContext? context = null;
                 IPage? page = null;
                 try
@@ -226,6 +227,13 @@ namespace UltimateParser.Utils
                     GC.Collect();
                     GC.WaitForPendingFinalizers();
                 }
+
+                // save and exit
+                if (UltimateParser_Main.isExit) { 
+                    Logger.Log("App_Cancel");
+                    break; 
+                }
+
             }
 
             throw new Exception("Неизвестная ошибка цикла переподключений Playwright.");
