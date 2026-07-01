@@ -5,6 +5,7 @@ using UltimateParser.Utils;
 using AngleSharp.XPath;
 using UltimateParser.Export;
 using AngleSharp;
+using UltimateParser.HotFilters;
 
 namespace UltimateParser.Engines 
 {
@@ -58,6 +59,7 @@ namespace UltimateParser.Engines
                         Logger.Log("Warn_Item_Rejected", itemIndex, "TableCP_Validation_Failed");
                     }
                 }
+                results = HotFilter.GetFilter(results);
 
                 Logger.Log("Page_Done", i, results.Count);
                 OnCheckpoint?.Invoke(results);

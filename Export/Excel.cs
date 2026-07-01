@@ -18,7 +18,7 @@ namespace UltimateParser.Export
                 return; 
             }
 
-            var lines = File.ReadAllLines(safePath, Encoding.UTF8);
+            var lines = File.ReadAllLines(safePath, new UTF8Encoding(true));
             if (lines.Length <= 0) return;
 
             var table = new DataTable();

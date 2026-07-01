@@ -74,7 +74,7 @@ namespace UltimateParser.Utils
         }
 
         public static async Task ImageCleanup () {
-            await _page.EvaluateAsync(@"() => {
+            await _page!.EvaluateAsync(@"() => {
             document.querySelectorAll('img').forEach(img => img.remove());
             document.querySelectorAll('.ads-block, .banner').forEach(el => el.remove());
         }");

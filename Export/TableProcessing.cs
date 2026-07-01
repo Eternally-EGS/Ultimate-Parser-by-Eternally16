@@ -36,6 +36,5 @@ namespace UltimateParser.Export
 
             return true;
         }
-
     }
 }

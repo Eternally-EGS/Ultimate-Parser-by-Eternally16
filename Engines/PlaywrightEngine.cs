@@ -5,6 +5,7 @@ using UltimateParser.Utils;
 using AngleSharp.XPath;
 using UltimateParser.Export;
 using AngleSharp;
+using UltimateParser.HotFilters;
 
 namespace UltimateParser.Engines
 {
@@ -43,6 +44,7 @@ namespace UltimateParser.Engines
                             }
                         } else { Logger.Log("Warn_Item_Rejected", itemIndex, "TableCP_Validation_Failed"); }
                     }
+                    results = HotFilter.GetFilter(results);
                     Logger.Log("Page_Done", i, results.Count);
                     OnCheckpoint?.Invoke(results);
                     await Task.Delay(Random.Shared.Next(config.MinDelay, config.MaxDelay));
@@ -70,6 +72,7 @@ namespace UltimateParser.Engines
                             }
                         } else { Logger.Log("Warn_Item_Rejected", itemIndex, "TableCP_Validation_Failed"); }
                     }
+                    results = HotFilter.GetFilter(results);
                     Logger.Log("List_Done", results.Count);
                     OnCheckpoint?.Invoke(results);
                     await SimplePageLoader.ScrollDownAsync(config);

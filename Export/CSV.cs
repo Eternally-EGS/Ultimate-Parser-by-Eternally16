@@ -11,12 +11,12 @@ namespace UltimateParser.Export
                 var safeResult = result ?? new List<Dictionary<string,string>>();
                 var safePath = path ?? "Out.csv";
 
-                using(var writer = new StreamWriter(safePath,false,Encoding.UTF8)){
+                using(var writer = new StreamWriter(safePath,false,new UTF8Encoding(true))){
                     writer.WriteLine(string.Join(";",safeHead));
 
                     foreach (var row in safeResult) {
                         if (row == null) continue;
-                        var value = safeHead.Select(el => el != null && row.ContainsKey(el) ? row[el] : "");
+                        var value = safeHead.Select(el => el != null && row.ContainsKey(el) ? row[el] : "Нет данных");
                         writer.WriteLine(string.Join(";",value.Select(v => $"\"{v}\"")));
                     }
                 }
