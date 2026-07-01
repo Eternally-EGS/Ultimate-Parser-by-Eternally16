@@ -4,6 +4,7 @@ using UltimateParser.Parsers;
 using UltimateParser.Utils;
 using AngleSharp.XPath;
 using UltimateParser.Export;
+using AngleSharp;
 
 namespace UltimateParser.Engines
 {
@@ -15,6 +16,8 @@ namespace UltimateParser.Engines
         {
             var results = new List<Dictionary<string, string>>();
             if (config == null) return results;
+
+            if (config.Pages > 0) {
 
             for (var i = 1; i <= config.Pages; i++)
             {
@@ -44,6 +47,39 @@ namespace UltimateParser.Engines
                 Logger.Log("Page_Done", i, results.Count);
                 OnCheckpoint?.Invoke(results);
                 await Task.Delay(Random.Shared.Next(config.MinDelay, config.MaxDelay));
+            }
+            } else {
+                string url = (config.Url ?? "");
+                
+                await SimplePageLoader.InitBrowserAsync(config);
+                await SimplePageLoader.GotoAsync(url);
+
+                while (Math.Abs(config.Pages) > results.Count)
+                {
+                    if (UltimateParser_Main.isExit) break;
+                    
+                    string html = await SimplePageLoader.GetHtmlAsync();
+                    var document = await BrowsingContext.New(Configuration.Default.WithDefaultLoader()).OpenAsync(reg => reg.Content(html));
+                    
+                    var items = GetItems(document, config);
+                    
+                    foreach (var item in items)
+                    {
+                        var row = ParseSingleItem(item, config, url);
+                        if (TableProcessing.TableCP(row, config)) 
+                        { 
+                            if (!results.Any(r => r.Values.SequenceEqual(row.Values))) 
+                                results.Add(row); 
+                        }
+                    }
+
+                    Logger.Log("List_Done", results.Count);
+                    OnCheckpoint?.Invoke(results);
+
+                    await SimplePageLoader.ScrollDownAsync();
+
+                    await Task.Delay(Random.Shared.Next(config.MinDelay, config.MaxDelay));
+                }
             }
             return results;
         }

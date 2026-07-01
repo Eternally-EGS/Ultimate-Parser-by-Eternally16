@@ -250,11 +250,11 @@ namespace UltimateParser.Utils
                 }
                 finally
                 {
-                    if (page != null) { try { await page.CloseAsync(); } catch { } }
-                    if (context != null) { try { await context.CloseAsync(); } catch { } }
+                   /// if (page != null) { try { await page.CloseAsync(); } catch { } }
+                  //  if (context != null) { try { await context.CloseAsync(); } catch { } }
                     
-                    GC.Collect();
-                    GC.WaitForPendingFinalizers();
+                  //  GC.Collect();
+                   // GC.WaitForPendingFinalizers();
                 }
 
                 // save and exit
