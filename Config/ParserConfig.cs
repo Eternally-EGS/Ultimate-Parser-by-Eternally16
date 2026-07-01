@@ -37,8 +37,6 @@ namespace UltimateParser.Config {
         public string TimezoneId {get; set;} = string.Empty;
         // Waiting Selector
         public string WaitForSelector {get; set;} = string.Empty;
-        // Timeout (milisecunde)
-        public int Timeout {get; set;}
         // Enable JS 
         public bool JS {get; set;}
         // Randomization tick
@@ -69,6 +67,12 @@ namespace UltimateParser.Config {
         public string ExportFolderPath {get; set;} = string.Empty;
         // Table cleanup
         public bool PostProcessing { get; set; } = true;
+        // Browser path
+        public string ExecutablePath { get; set; } = "";
+        public float NetworkTimeout { get; set; } = 30000f; 
+        public float SelectorTimeout { get; set; } = 15000f; 
+        public bool MoveMouseImitation {get; set;}
+        public int ImitationStepsCount {get; set;} = 10;
     }
 
 }
